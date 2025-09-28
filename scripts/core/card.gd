@@ -1,6 +1,6 @@
 class_name Card
 ## Represents a single Hanafuda card
-extends Node
+extends RefCounted
 
 ## Card types
 enum CardType {
@@ -20,3 +20,5 @@ func _init(m: int, n: int, t: CardType, p: int) -> void:
 	number = n
 	type = t
 	points = p
+
+	# get_node("CardImage").texture = load("res://assets/%d-%d.png" % [month, number])

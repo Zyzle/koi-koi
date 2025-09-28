@@ -1,7 +1,7 @@
-class_name Deck
-extends Node
+class_name CardsDB
+extends Resource
 
-const DECK: Array[Dictionary] = [
+const BASE_DECK: Array[Dictionary] = [
 	# January
 	{"month": 1, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 1, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
@@ -63,16 +63,3 @@ const DECK: Array[Dictionary] = [
 	{"month": 12, "number": 3, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 12, "number": 4, "type": Card.CardType.BRIGHT, "points": 20}
 ]
-
-var cards: Array[Card] = []
-
-
-func _init() -> void:
-	for card_data in DECK:
-		var card = Card.new(card_data["month"], card_data["number"], card_data["type"], card_data["points"])
-		cards.append(card)
-	cards.shuffle()
-
-
-func draw_card() -> Card:
-	return cards.pop_back()

@@ -1,10 +1,52 @@
-[gd_scene load_steps=2 format=3 uid="uid://caackk67eodkv"]
+[gd_scene load_steps=3 format=3 uid="uid://caackk67eodkv"]
 
-[ext_resource type="Texture2D" uid="uid://den46ep2yks8e" path="res://assets/cardback.png" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://c6cbxr6nopwyu" path="res://scripts/core/game_manager.gd" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://clriuypxdy4nq" path="res://scripts/ui/ui_manager.gd" id="2_0wfyh"]
 
 [node name="Main" type="Node2D"]
 
-[node name="Card" type="Node2D" parent="."]
+[node name="Managers" type="Node" parent="."]
 
-[node name="Back" type="Sprite2D" parent="Card"]
-texture = ExtResource("1_o5qli")
+[node name="GameManager" type="Node" parent="Managers"]
+script = ExtResource("1_o5qli")
+
+[node name="UIManager" type="Control" parent="Managers"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_0wfyh")
+
+[node name="GameWorld" type="Node2D" parent="."]
+
+[node name="OpponentHand" type="HBoxContainer" parent="GameWorld"]
+unique_name_in_owner = true
+offset_right = 1280.0
+offset_bottom = 254.0
+
+[node name="PlayerHand" type="HBoxContainer" parent="GameWorld"]
+unique_name_in_owner = true
+offset_top = 826.0
+offset_right = 1280.0
+offset_bottom = 1080.0
+
+[node name="Field" type="GridContainer" parent="GameWorld"]
+unique_name_in_owner = true
+offset_left = 360.0
+offset_top = 345.0
+offset_right = 920.0
+offset_bottom = 735.0
+columns = 4
+
+[node name="DeckContainer" type="PanelContainer" parent="GameWorld"]
+unique_name_in_owner = true
+offset_left = 96.0
+offset_top = 450.0
+offset_right = 214.0
+offset_bottom = 634.0
+
+[node name="DeckSprite" type="Sprite2D" parent="GameWorld/DeckContainer"]
+position = Vector2(59, 92)
+
+[node name="DeckLabel" type="RichTextLabel" parent="GameWorld/DeckContainer"]
+layout_mode = 2

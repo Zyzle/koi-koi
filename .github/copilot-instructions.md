@@ -54,14 +54,12 @@ The core game data is defined in `scripts/cards_db.gd`:
 - This implements traditional Koi-Koi (花札) rules with authentic Hanafuda cards
 - Card matching is based on month groupings (4 cards per month)
 - Different card types have different point values in traditional scoring
-- The DECK constant in `deck.gd` represents the complete 48-card set
+- The game uses a MVC architecture separating game logic, state, and UI
 
 ## Common Operations
 
 When adding new features:
 
 - Create new scripts in `scripts/` directory
-- Reference card data from `deck.cards` variable
-- Use `CardType` enum for type checking
 - Follow month-based card organization (1-12)
 - Maintain Godot's resource import system for assets
