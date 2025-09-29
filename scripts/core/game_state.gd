@@ -66,6 +66,7 @@ func add_cards_to_deck(cards: Array[Card]) -> void:
 	deck = cards
 	deck.shuffle()
 	deck_setup.emit(deck)
+	
 
 func deal_card_to_player() -> void:
 	if deck.size() == 0:
@@ -74,3 +75,21 @@ func deal_card_to_player() -> void:
 	var card = deck.pop_back()
 	player_hand.append(card)
 	card_dealt_to_player.emit(card)
+
+
+func deal_card_to_opponent() -> void:
+	if deck.size() == 0:
+		print("Deck is empty, cannot deal to opponent")
+		pass
+	var card = deck.pop_back()
+	opponent_hand.append(card)
+	card_dealt_to_opponent.emit(card)
+
+
+func deal_card_to_field() -> void:
+	if deck.size() == 0:
+		print("Deck is empty, cannot deal to field")
+		pass
+	var card = deck.pop_back()
+	field_cards.append(card)
+	card_dealt_to_field.emit(card)

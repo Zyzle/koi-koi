@@ -1,16 +1,13 @@
 class_name CardVisual
-extends Control
+extends Node2D
 
 var card_data: Card
-var card_index: int
-var card_owner: String
+
 
 signal card_clicked(card_visual: CardVisual)
 signal card_matched(card_visual: CardVisual, matched_cards: Array)
 
-func setup_card(card: Card, index: int, o: String):
+func setup_card(card: Card):
 	card_data = card
-	card_index = index
-	card_owner = o
-	# Update visual representation here, e.g., set texture based on card properties
-	# update_visual()
+	var texture_path = "res://assets/%d-%d.png" % [card_data.month, card_data.number]
+	$CardImage.texture = load(texture_path)

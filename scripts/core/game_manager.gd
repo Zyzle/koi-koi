@@ -42,6 +42,8 @@ func connect_signals():
 	# UI signals - forward game state changes to UI
 	game_state.deck_setup.connect(ui_manager.on_deck_setup)
 	game_state.card_dealt_to_player.connect(ui_manager.on_card_dealt_to_player)
+	game_state.card_dealt_to_field.connect(ui_manager.on_card_dealt_to_field)
+	game_state.card_dealt_to_opponent.connect(ui_manager.on_card_dealt_to_opponent)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
@@ -56,6 +58,10 @@ func _on_phase_changed(new_phase: GameState.Phase):
 	match new_phase:
 		GameState.Phase.DEAL:
 			print("Dealing cards...")
+			for i in range(8):
+				game_state.deal_card_to_player()
+				game_state.deal_card_to_opponent()
+				game_state.deal_card_to_field()
 		GameState.Phase.PLAY:
 			print("Starting play phase")
 
