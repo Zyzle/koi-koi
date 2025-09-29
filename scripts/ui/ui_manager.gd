@@ -22,13 +22,23 @@ func on_deck_setup(deck: Array[Card]):
 
 
 func setup_deck_display(deck: Array[Card]):
-	# Your deck display logic here
-	# deck_container.get_node("DeckSprite").texture = preload("res://assets/cardback.png")
+	print("Creating ", deck.size(), " card visuals")
+	
+	# Create all card visuals but keep them invisible initially
+	# This prevents stacking issues in the deck container
 	for card in deck:
 		var card_visual = create_card_visual(card)
 		card_registry[card] = card_visual
+		
+		# Set up for deck display
+		# card_visual.visible = false # Hide until dealt
+		
+		# Stacking is preferred for Deck
 		deck_container.add_child(card_visual)
-	deck_container.get_node("DeckLabel").text = str(deck.size())
+	
+	# Update deck count display
+	if deck_container.has_node("DeckLabel"):
+		deck_container.get_node("DeckLabel").text = str(deck.size())
 
 	
 	# for deck_node in deck_container.get_children():
@@ -55,6 +65,12 @@ func create_card_visual(card: Card) -> CardVisual:
 	var card_scene = preload(CARD_SCENE_PATH)
 	var card_visual = card_scene.instantiate()
 	card_visual.setup_card(card)
+	
+	# Configure for container layout
+	# card_visual.custom_minimum_size = Vector2(80, 112) # Standard card aspect ratio
+	# card_visual.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	# card_visual.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	
 	return card_visual
 
 
@@ -70,20 +86,27 @@ func move_card_visual(card: Card, target_container: Control, animate: bool = tru
 		print("Error: No CardVisual found for card: ", card)
 		return
 	
-	# Get current global position for animation
-	var start_pos = card_visual.global_position
-	
-	# Reparent to new container
-	var old_parent = card_visual.get_parent()
-	if old_parent:
-		old_parent.remove_child(card_visual)
-	target_container.add_child(card_visual)
-	
 	if animate:
-		# Calculate end position after reparenting
+		# Get current global position before reparenting
+		var start_pos = card_visual.global_position
+		
+		# Reparent to new container
+		var old_parent = card_visual.get_parent()
+		if old_parent:
+			old_parent.remove_child(card_visual)
+		target_container.add_child(card_visual)
+		
+		# Let container position the card, then animate from old position
+		await get_tree().process_frame # Wait for layout
 		var end_pos = card_visual.global_position
 		
-		# Start from old position and animate to new
+		# Animate from old position to new container position
 		card_visual.global_position = start_pos
 		var tween = create_tween()
 		tween.tween_property(card_visual, "global_position", end_pos, 0.5)
+	else:
+		# Simple reparenting without animation
+		var old_parent = card_visual.get_parent()
+		if old_parent:
+			old_parent.remove_child(card_visual)
+		target_container.add_child(card_visual)
