@@ -20,5 +20,3 @@ func _init(m: int, n: int, t: CardType, p: int) -> void:
 	number = n
 	type = t
 	points = p
-
-	# get_node("CardImage").texture = load("res://assets/%d-%d.png" % [month, number])

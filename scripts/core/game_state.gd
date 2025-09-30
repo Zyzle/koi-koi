@@ -72,7 +72,7 @@ func deal_card_to_player() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to player")
 		pass
-	var card = deck.pop_back()
+	var card = deck.pop_front()
 	player_hand.append(card)
 	card_dealt_to_player.emit(card)
 
@@ -81,7 +81,7 @@ func deal_card_to_opponent() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to opponent")
 		pass
-	var card = deck.pop_back()
+	var card = deck.pop_front()
 	opponent_hand.append(card)
 	card_dealt_to_opponent.emit(card)
 
@@ -90,6 +90,6 @@ func deal_card_to_field() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to field")
 		pass
-	var card = deck.pop_back()
+	var card = deck.pop_front()
 	field_cards.append(card)
 	card_dealt_to_field.emit(card)

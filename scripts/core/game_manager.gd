@@ -16,14 +16,12 @@ func _ready():
 	call_deferred("initialize_game")
 
 func initialize_game():
-	"""Initialize the game after all nodes are ready"""
 	print("Initializing game - all nodes ready")
 	
 	connect_signals()
 	setup_new_game()
 
 func connect_signals():
-	"""Connect all game state signals to their handlers"""
 	print("Connecting signals...")
 	
 	# Game flow signals
@@ -62,6 +60,7 @@ func _on_phase_changed(new_phase: GameState.Phase):
 				game_state.deal_card_to_player()
 				game_state.deal_card_to_opponent()
 				game_state.deal_card_to_field()
+			ui_manager.process_deal_queue()
 		GameState.Phase.PLAY:
 			print("Starting play phase")
 
