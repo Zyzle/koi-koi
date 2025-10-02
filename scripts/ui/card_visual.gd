@@ -14,6 +14,7 @@ signal card_matched(card_visual: CardVisual, matched_cards: Array)
 func _ready() -> void:
 	$Visuals/CardImage.mouse_entered.connect(on_mouse_entered)
 	$Visuals/CardImage.mouse_exited.connect(on_mouse_exited)
+	$Visuals/CardImage.gui_input.connect(on_gui_input)
 	original_min_size = custom_minimum_size
 
 
@@ -36,31 +37,19 @@ func flip_card() -> void:
 	get_node("Visuals/AnimationPlayer").play("card_flip")
 
 
-func _gui_input(event) -> void:
+func on_gui_input(event) -> void:
 	if _card_data.is_player_card:
-		# if event is InputEventMouseMotion:
-		# 	self.scale = Vector2(1.1, 1.1)
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			card_clicked.emit(self)
 
 
 func on_mouse_entered() -> void:
 	if _card_data.is_player_card:
-		custom_minimum_size = original_min_size * 1.2
-		
-		# Debug: Check if child resized automatically
-		await get_tree().process_frame # Wait for layout update
-		print("Parent size: ", size)
-		print("Visuals size: ", $Visuals.size)
-		print("CardImage size: ", $Visuals/CardImage.size)
+		var tween = create_tween()
+		tween.tween_property(self, "custom_minimum_size", original_min_size * 1.2, 0.2)
 
 
 func on_mouse_exited() -> void:
 	if _card_data.is_player_card:
-		custom_minimum_size = original_min_size
-
-
-func update_parent_layout() -> void:
-	# Trigger parent container to recalculate layout
-	if get_parent() is Container:
-		get_parent().queue_sort()
+		var tween = create_tween()
+		tween.tween_property(self, "custom_minimum_size", original_min_size, 0.2)
