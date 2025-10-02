@@ -12,8 +12,8 @@ signal card_clicked(card_visual: CardVisual)
 signal card_matched(card_visual: CardVisual, matched_cards: Array)
 
 func _ready() -> void:
-	connect("mouse_entered", on_mouse_entered)
-	connect("mouse_exited", on_mouse_exited)
+	$Visuals/CardImage.mouse_entered.connect(on_mouse_entered)
+	$Visuals/CardImage.mouse_exited.connect(on_mouse_exited)
 	original_min_size = custom_minimum_size
 
 
@@ -47,21 +47,17 @@ func _gui_input(event) -> void:
 func on_mouse_entered() -> void:
 	if _card_data.is_player_card:
 		custom_minimum_size = original_min_size * 1.2
-		$Visuals/CardImage.scale = Vector2(1.2, 1.2)
-		# Animate scale change
-		# var tween = create_tween()
-		# tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.1)
-		# tween.tween_callback(update_parent_layout)
+		
+		# Debug: Check if child resized automatically
+		await get_tree().process_frame # Wait for layout update
+		print("Parent size: ", size)
+		print("Visuals size: ", $Visuals.size)
+		print("CardImage size: ", $Visuals/CardImage.size)
 
 
 func on_mouse_exited() -> void:
 	if _card_data.is_player_card:
 		custom_minimum_size = original_min_size
-		$Visuals/CardImage.scale = Vector2(1.0, 1.0)
-		# Animate scale change
-		# var tween = create_tween()
-		# tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1)
-		# tween.tween_callback(update_parent_layout)
 
 
 func update_parent_layout() -> void:
