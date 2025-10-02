@@ -73,6 +73,7 @@ func deal_card_to_player() -> void:
 		print("Deck is empty, cannot deal to player")
 		pass
 	var card = deck.pop_front()
+	card.make_player_card()
 	player_hand.append(card)
 	card_dealt_to_player.emit(card)
 

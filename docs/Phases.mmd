@@ -1,0 +1,23 @@
+stateDiagram-v2
+    %% Define state labels upfront to avoid repetition
+    s1: Deal
+    s2: Player Turn
+    s3: Opponent Turn
+    s4: Score Player
+    s5: Score Opponent
+    s6: Koi-koi? Player
+    s7: Koi-koi? Opponent
+    s8: Round End
+
+    [*] --> s1
+    s1 --> s2
+    s2 --> s4
+    s4 --> s6 : hand
+    s4 --> s3 : no hand
+    s6 --> s3 : koi-koi
+    s6 --> s8 : stop
+    s3 --> s7 : hand
+    s3 --> s2 : no hand
+    s7 --> s2 : koi-koi
+    s7 --> s8 : stop
+    s8 --> [*]

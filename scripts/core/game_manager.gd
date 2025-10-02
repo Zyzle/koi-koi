@@ -6,8 +6,7 @@ var game_state: GameState
 var ui_manager: UIManager
 # var nework_manager: NetworkManager
 
-func _ready():
-	print("GameManager ready")
+func _ready() -> void:
 	game_state = GameState.new()
 	ui_manager = get_node("../UIManager")
 	ui_manager.game_manager = self
@@ -15,15 +14,11 @@ func _ready():
 	# Defer initialization to ensure all nodes are ready
 	call_deferred("initialize_game")
 
-func initialize_game():
-	print("Initializing game - all nodes ready")
-	
+func initialize_game() -> void:
 	connect_signals()
 	setup_new_game()
 
-func connect_signals():
-	print("Connecting signals...")
-	
+func connect_signals() -> void:
 	# Game flow signals
 	game_state.phase_changed.connect(_on_phase_changed)
 	game_state.turn_changed.connect(_on_turn_changed)
@@ -46,12 +41,10 @@ func connect_signals():
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
 	# game_state.score_updated.connect(ui_manager.update_scores)
-	
-	print("All signals connected")
 
 
 # Game flow signal handlers
-func _on_phase_changed(new_phase: GameState.Phase):
+func _on_phase_changed(new_phase: GameState.Phase) -> void:
 	print("Phase changed to: ", new_phase)
 	match new_phase:
 		GameState.Phase.DEAL:
@@ -65,7 +58,7 @@ func _on_phase_changed(new_phase: GameState.Phase):
 			print("Starting play phase")
 
 
-func _on_turn_changed(new_turn: GameState.Turn):
+func _on_turn_changed(new_turn: GameState.Turn) -> void:
 	print("Turn changed to: ", new_turn)
 	if new_turn == GameState.Turn.OPPONENT:
 		# AI will make move here later
@@ -75,8 +68,7 @@ func _on_turn_changed(new_turn: GameState.Turn):
 ## Create a new array of all the cards in the cards db,
 ## then pass these to game_state via add_cards_to_deck()
 ## moves the current_phase to DEAL
-func setup_new_game():
-	print("Setting up new game...")
+func setup_new_game() -> void:
 	var cards: Array[Card] = []
 	for card in CardsDB.BASE_DECK:
 		var card_instance = Card.new(card["month"], card["number"], card["type"], card["points"])

@@ -13,19 +13,25 @@ var card_registry: Dictionary
 var deal_registry: Array[Dictionary]
 
 
-func _ready():
-	print("UIManager _ready() called")
+func _ready() -> void:
+	pass
 	
 
-func on_deck_setup(deck: Array[Card]):
+func on_deck_setup(deck: Array[Card]) -> void:
 	setup_deck_display(deck)
 
 
-func setup_deck_display(deck: Array[Card]):
+func on_card_clicked(card_visual: CardVisual) -> void:
+	print("UIManager detected card click: ", card_visual.card_data)
+	# game_manager.handle_player_card_click(card_visual.card_data)
+
+
+func setup_deck_display(deck: Array[Card]) -> void:
 	# Create all card visuals but keep them invisible initially
 	# This prevents stacking issues in the deck container
 	for card in deck:
 		var card_visual = create_card_visual(card)
+		card_visual.card_clicked.connect(on_card_clicked)
 		card_registry[card] = card_visual
 		
 		# Stacking is preferred for Deck
@@ -36,19 +42,19 @@ func setup_deck_display(deck: Array[Card]):
 		deck_container.get_node("DeckLabel").text = str(deck.size())
 
 
-func on_card_dealt_to_player(card: Card):
+func on_card_dealt_to_player(card: Card) -> void:
 	deal_registry.append({card = card, target = player_hand_container})
 
 
-func on_card_dealt_to_field(card: Card):
+func on_card_dealt_to_field(card: Card) -> void:
 	deal_registry.append({card = card, target = field_container})
 
 
-func on_card_dealt_to_opponent(card: Card):
+func on_card_dealt_to_opponent(card: Card) -> void:
 	deal_registry.append({card = card, target = opponent_hand_container})
 
 
-func process_deal_queue():
+func process_deal_queue() -> void:
 	for deal in deal_registry:
 		var tween
 		if deal.target == opponent_hand_container:
