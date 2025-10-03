@@ -66,6 +66,9 @@ func process_deal_queue() -> void:
 
 		if tween:
 			await tween.finished
+			# reset z_index after animation
+			var visual = get_card_visual(deal.card)
+			visual.z_index = 1
 	deal_registry.clear()
 
 
@@ -109,7 +112,8 @@ func move_card_visual(card: Card, target_container: Control, animate: bool = tru
 		card_visual.global_position = start_pos
 		# unhide card at start of animation
 		card_visual.toggle_visibility(true)
-		card_visual.z_index = 1
+		# ensure card_visual is on top during animation
+		card_visual.z_index = 10
 
 		if and_flip:
 			card_visual.flip_card()
