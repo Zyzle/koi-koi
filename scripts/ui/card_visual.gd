@@ -1,6 +1,8 @@
 class_name CardVisual
 extends Control
 
+const HIGHLIGHT_SHADER_PATH = "res://shaders/card_highlight_shader.gdshader"
+
 var _card_data: Card
 
 var card_data: Card:
@@ -35,6 +37,21 @@ func update_visual() -> void:
 func flip_card() -> void:
 	# use scene defined animation for card flip
 	get_node("Visuals/AnimationPlayer").play("card_flip")
+
+
+func apply_highlight() -> void:
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = preload(HIGHLIGHT_SHADER_PATH)
+	shader_material.set_shader_parameter("color", Color.YELLOW)
+	shader_material.set_shader_parameter("inner_stroke_thickness", 5.0)
+	shader_material.set_shader_parameter("frequency", 8.0)
+	shader_material.set_shader_parameter("phase_speed", 5.0)
+	shader_material.set_shader_parameter("outer_stroke_thickness", 5.0)
+	$Visuals/CardImage.material = shader_material
+
+
+func remove_highlight() -> void:
+	$Visuals/CardImage.material = null
 
 
 func on_gui_input(event) -> void:
