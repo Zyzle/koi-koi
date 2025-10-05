@@ -1,6 +1,8 @@
-# Koi-koi
+# Koi-koi (こいこい)
 
-My go at implementing the Japanese Hanafuda card game Koi-Koi using the Godot game engine
+My go at implementing the Japanese Hanafuda card game Koi-Koi (こいこい) using the Godot game engine
+
+Checkout the docs folder for more information on how the game is played
 
 
 ## Artwork
