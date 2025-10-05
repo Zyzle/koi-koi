@@ -8,22 +8,44 @@ const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 @onready var opponent_hand_container: HBoxContainer = %OpponentHand
 @onready var deck_container: PanelContainer = %DeckContainer
 
+signal deal_finished();
+
 var game_manager: GameManager
+var game_state: GameState
 var card_registry: Dictionary
 var deal_registry: Array[Dictionary]
+var selected_card: CardVisual
 
 
-func _ready() -> void:
-	pass
+func set_game_state(state: GameState) -> void:
+	game_state = state
 	
 
 func on_deck_setup(deck: Array[Card]) -> void:
 	setup_deck_display(deck)
 
 
-func on_card_clicked(card_visual: CardVisual) -> void:
-	print("UIManager detected card click: ", card_visual.card_data)
-	# game_manager.handle_player_card_click(card_visual.card_data)
+func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
+	print("UIManager detected card click: ", clicked_card_visual.card_data)
+	if clicked_card_visual == selected_card:
+		# Deselect if clicking the same card
+		selected_card.set_selected(false)
+		selected_card = null
+		game_state.player_choose_card(null)
+	else:
+		# Deselect previous selection
+		if selected_card:
+			selected_card.set_selected(false)
+		# Select new card
+		selected_card = clicked_card_visual
+		selected_card.set_selected(true)
+		game_state.player_choose_card(selected_card.card_data)
+
+
+func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
+	print("UIManager detected field card click: ", clicked_card_visual.card_data)
+	pass
+	# player_paired_cards.emit(selected_card.card_data, clicked_card_visual.card_data)
 
 
 func setup_deck_display(deck: Array[Card]) -> void:
@@ -31,7 +53,8 @@ func setup_deck_display(deck: Array[Card]) -> void:
 	# This prevents stacking issues in the deck container
 	for card in deck:
 		var card_visual = create_card_visual(card)
-		card_visual.card_clicked.connect(on_card_clicked)
+		card_visual.player_card_clicked.connect(on_player_card_clicked)
+		card_visual.field_card_clicked.connect(on_field_card_clicked)
 		card_registry[card] = card_visual
 		
 		# Stacking is preferred for Deck
@@ -54,6 +77,19 @@ func on_card_dealt_to_opponent(card: Card) -> void:
 	deal_registry.append({card = card, target = opponent_hand_container})
 
 
+func on_player_selected_card(card: Card) -> void:
+	# Highlight the selected card in field hand
+	for child in field_container.get_children():
+		if child is CardVisual:
+			var card_visual = child as CardVisual
+			if card == null:
+				card_visual.remove_highlight()
+			elif card_visual.card_data.month == card.month:
+				card_visual.apply_highlight()
+			else:
+				card_visual.remove_highlight()
+
+
 func process_deal_queue() -> void:
 	for deal in deal_registry:
 		var tween
@@ -70,12 +106,17 @@ func process_deal_queue() -> void:
 			var visual = get_card_visual(deal.card)
 			visual.z_index = 1
 	deal_registry.clear()
+	deal_finished.emit()
 
 
 func create_card_visual(card: Card) -> CardVisual:
 	var card_scene = preload(CARD_SCENE_PATH)
 	var card_visual = card_scene.instantiate()
 	card_visual.setup_card(card)
+	
+	# Pass GameState if CardVisual needs it
+	if game_state:
+		card_visual.set_game_state(game_state)
 	
 	return card_visual
 

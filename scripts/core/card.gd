@@ -15,6 +15,7 @@ var number: int
 var type: CardType
 var points: int
 var is_player_card: bool = false
+var is_field_card: bool = false
 
 func _init(m: int, n: int, t: CardType, p: int) -> void:
 	month = m
@@ -25,3 +26,6 @@ func _init(m: int, n: int, t: CardType, p: int) -> void:
 
 func make_player_card() -> void:
 	is_player_card = true
+
+func make_field_card() -> void:
+	is_field_card = true

@@ -14,14 +14,21 @@ func _ready() -> void:
 	# Defer initialization to ensure all nodes are ready
 	call_deferred("initialize_game")
 
+
 func initialize_game() -> void:
+	# Pass GameState to UIManager
+	ui_manager.set_game_state(game_state)
 	connect_signals()
 	setup_new_game()
+
 
 func connect_signals() -> void:
 	# Game flow signals
 	game_state.phase_changed.connect(_on_phase_changed)
 	game_state.turn_changed.connect(_on_turn_changed)
+
+	ui_manager.deal_finished.connect(_on_deal_finished)
+	# ui_manager.player_selected_card.connect(_on_player_selected_card)
 	
 	# Card movement signals for game logic
 	# game_state.card_moved_to_field.connect(_on_card_moved_to_field)
@@ -37,6 +44,7 @@ func connect_signals() -> void:
 	game_state.card_dealt_to_player.connect(ui_manager.on_card_dealt_to_player)
 	game_state.card_dealt_to_field.connect(ui_manager.on_card_dealt_to_field)
 	game_state.card_dealt_to_opponent.connect(ui_manager.on_card_dealt_to_opponent)
+	game_state.player_selected_card.connect(ui_manager.on_player_selected_card)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
@@ -56,6 +64,7 @@ func _on_phase_changed(new_phase: GameState.Phase) -> void:
 			ui_manager.process_deal_queue()
 		GameState.Phase.PLAY:
 			print("Starting play phase")
+			game_state.current_turn = GameState.Turn.PLAYER
 
 
 func _on_turn_changed(new_turn: GameState.Turn) -> void:
@@ -63,6 +72,10 @@ func _on_turn_changed(new_turn: GameState.Turn) -> void:
 	if new_turn == GameState.Turn.OPPONENT:
 		# AI will make move here later
 		pass
+
+
+func _on_deal_finished() -> void:
+	game_state.current_phase = GameState.Phase.PLAY
 
 
 ## Create a new array of all the cards in the cards db,

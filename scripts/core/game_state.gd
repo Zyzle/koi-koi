@@ -24,7 +24,6 @@ var _current_turn: Turn
 var current_phase: Phase:
 	get: return _current_phase
 	set(value):
-		print("Setting current_phase to ", value)
 		if _current_phase != value:
 			_current_phase = value
 			phase_changed.emit(value)
@@ -50,8 +49,7 @@ var opponent_score: int
 # Game Flow Signals
 signal phase_changed(new_phase: Phase)
 signal turn_changed(new_turn: Turn)
-signal round_started(round_number: int)
-signal game_ended(winner: Turn)
+signal player_selected_card(card: Card)
 
 # Card Movement Signals
 signal card_dealt_to_player(card: Card)
@@ -92,5 +90,10 @@ func deal_card_to_field() -> void:
 		print("Deck is empty, cannot deal to field")
 		pass
 	var card = deck.pop_front()
+	card.make_field_card()
 	field_cards.append(card)
 	card_dealt_to_field.emit(card)
+
+
+func player_choose_card(card: Card) -> void:
+	player_selected_card.emit(card)
