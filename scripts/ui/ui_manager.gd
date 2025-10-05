@@ -25,36 +25,14 @@ func on_deck_setup(deck: Array[Card]) -> void:
 	setup_deck_display(deck)
 
 
-func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
-	print("UIManager detected card click: ", clicked_card_visual.card_data)
-	if clicked_card_visual == selected_card:
-		# Deselect if clicking the same card
-		selected_card.set_selected(false)
-		selected_card = null
-		game_state.player_choose_card(null)
-	else:
-		# Deselect previous selection
-		if selected_card:
-			selected_card.set_selected(false)
-		# Select new card
-		selected_card = clicked_card_visual
-		selected_card.set_selected(true)
-		game_state.player_choose_card(selected_card.card_data)
-
-
-func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
-	print("UIManager detected field card click: ", clicked_card_visual.card_data)
-	pass
-	# player_paired_cards.emit(selected_card.card_data, clicked_card_visual.card_data)
-
-
 func setup_deck_display(deck: Array[Card]) -> void:
 	# Create all card visuals but keep them invisible initially
 	# This prevents stacking issues in the deck container
 	for card in deck:
 		var card_visual = create_card_visual(card)
-		card_visual.player_card_clicked.connect(on_player_card_clicked)
-		card_visual.field_card_clicked.connect(on_field_card_clicked)
+		# Connect directly to GameManager (Controller) instead of UIManager
+		card_visual.player_card_clicked.connect(game_manager.on_player_card_clicked)
+		card_visual.field_card_clicked.connect(game_manager.on_field_card_clicked)
 		card_registry[card] = card_visual
 		
 		# Stacking is preferred for Deck
@@ -77,8 +55,21 @@ func on_card_dealt_to_opponent(card: Card) -> void:
 	deal_registry.append({card = card, target = opponent_hand_container})
 
 
-func on_player_selected_card(card: Card) -> void:
-	# Highlight the selected card in field hand
+func player_selected_card(card: Card) -> void:
+	# Update visual selection state
+	if selected_card:
+		selected_card.set_selected(false)
+	
+	if card:
+		# Find and select the new card
+		var card_visual = get_card_visual(card)
+		if card_visual:
+			card_visual.set_selected(true)
+			selected_card = card_visual
+	else:
+		selected_card = null
+		
+	# Highlight matching field cards
 	for child in field_container.get_children():
 		if child is CardVisual:
 			var card_visual = child as CardVisual

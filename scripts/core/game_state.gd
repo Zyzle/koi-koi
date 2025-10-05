@@ -51,11 +51,10 @@ signal phase_changed(new_phase: Phase)
 signal turn_changed(new_turn: Turn)
 signal player_selected_card(card: Card)
 
-# Card Movement Signals
-signal card_dealt_to_player(card: Card)
-signal card_dealt_to_opponent(card: Card)
-signal card_dealt_to_field(card: Card)
-signal deck_setup(deck: Array[Card])
+# Model Events (generic)
+signal card_moved(card: Card, from_location: String, to_location: String)
+signal deck_initialized(deck: Array[Card])
+signal hand_changed(player: Turn, cards: Array[Card])
 
 
 ## Add a set of `Card` instances to the deck and shuffle
@@ -63,36 +62,36 @@ signal deck_setup(deck: Array[Card])
 func add_cards_to_deck(cards: Array[Card]) -> void:
 	deck = cards
 	deck.shuffle()
-	deck_setup.emit(deck)
+	deck_initialized.emit(deck)
 	
 
 func deal_card_to_player() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to player")
-		pass
+		return
 	var card = deck.pop_front()
 	card.make_player_card()
 	player_hand.append(card)
-	card_dealt_to_player.emit(card)
+	card_moved.emit(card, "deck", "player_hand")
 
 
 func deal_card_to_opponent() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to opponent")
-		pass
+		return
 	var card = deck.pop_front()
 	opponent_hand.append(card)
-	card_dealt_to_opponent.emit(card)
+	card_moved.emit(card, "deck", "opponent_hand")
 
 
 func deal_card_to_field() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to field")
-		pass
+		return
 	var card = deck.pop_front()
 	card.make_field_card()
 	field_cards.append(card)
-	card_dealt_to_field.emit(card)
+	card_moved.emit(card, "deck", "field")
 
 
 func player_choose_card(card: Card) -> void:
