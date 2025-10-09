@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6a35s5exauwp"]
+
+[ext_resource type="Texture2D" uid="uid://dpewcvjpejpmn" path="res://assets/slot.png" id="1_4v6ba"]
+[ext_resource type="Script" uid="uid://maftw6w4g84g" path="res://scripts/ui/slot.gd" id="1_ic0fu"]
+
+[node name="Slot" type="Node2D"]
+script = ExtResource("1_ic0fu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_4v6ba")

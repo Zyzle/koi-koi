@@ -19,6 +19,7 @@ enum Turn {
 # Private variables for properties with setters
 var _current_phase: Phase
 var _current_turn: Turn
+var _players_chosen_card: Card
 
 # Properties with automatic signal emission
 var current_phase: Phase:
@@ -34,6 +35,12 @@ var current_turn: Turn:
 		if _current_turn != value:
 			_current_turn = value
 			turn_changed.emit(value)
+
+var players_chosen_card: Card:
+	get: return _players_chosen_card
+	set(value):
+		_players_chosen_card = value
+		player_selected_card.emit(value)
 
 # Regular properties
 var round_number: int
@@ -52,9 +59,8 @@ signal turn_changed(new_turn: Turn)
 signal player_selected_card(card: Card)
 
 # Model Events (generic)
-signal card_moved(card: Card, from_location: String, to_location: String)
+signal card_moved(card: Card, from_to_location: String, move_also: Card)
 signal deck_initialized(deck: Array[Card])
-signal hand_changed(player: Turn, cards: Array[Card])
 
 
 ## Add a set of `Card` instances to the deck and shuffle
@@ -72,7 +78,7 @@ func deal_card_to_player() -> void:
 	var card = deck.pop_front()
 	card.make_player_card()
 	player_hand.append(card)
-	card_moved.emit(card, "deck", "player_hand")
+	card_moved.emit(card, "deck_player_hand", null)
 
 
 func deal_card_to_opponent() -> void:
@@ -81,7 +87,7 @@ func deal_card_to_opponent() -> void:
 		return
 	var card = deck.pop_front()
 	opponent_hand.append(card)
-	card_moved.emit(card, "deck", "opponent_hand")
+	card_moved.emit(card, "deck_opponent_hand", null)
 
 
 func deal_card_to_field() -> void:
@@ -91,8 +97,26 @@ func deal_card_to_field() -> void:
 	var card = deck.pop_front()
 	card.make_field_card()
 	field_cards.append(card)
-	card_moved.emit(card, "deck", "field")
+	card_moved.emit(card, "deck_field", null)
 
 
-func player_choose_card(card: Card) -> void:
-	player_selected_card.emit(card)
+func is_player_turn() -> bool:
+	return _current_phase == Phase.PLAY and _current_turn == Turn.PLAYER
+
+
+## When capturing cards, card1 is the players chosen card, either form their hand
+## or the top of the deck, card 2 is the field card being captured
+func player_captured_cards(card1: Card, card2: Card) -> void:
+	field_cards.erase(card2)
+	player_captured.append(card2)
+
+	if player_hand.has(card1):
+		# card came from player's hand
+		player_hand.erase(card1)
+		player_captured.append(card1)
+		card_moved.emit(card1, "player_field_captured", card2)
+	else:
+		# card came from the deck
+		deck.erase(card1)
+		player_captured.append(card1)
+		card_moved.emit(card1, "deck_field_captured", card2)

@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://oo5xmuiry8rc"]
+
+[ext_resource type="Script" uid="uid://b6n3i4h6y4cgb" path="res://scripts/ui/field.gd" id="1_unt50"]
+[ext_resource type="PackedScene" uid="uid://c6a35s5exauwp" path="res://scenes/slot.tscn" id="1_vtb3u"]
+
+[node name="Field" type="Node2D"]
+script = ExtResource("1_unt50")
+
+[node name="Slot1" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(-195, -105)
+
+[node name="Slot2" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(-65, -105)
+
+[node name="Slot3" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(65, -105)
+
+[node name="Slot4" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(195, -105)
+
+[node name="Slot5" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(-195, 105)
+
+[node name="Slot6" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(-65, 105)
+
+[node name="Slot7" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(65, 105)
+
+[node name="Slot8" parent="." instance=ExtResource("1_vtb3u")]
+position = Vector2(195, 105)

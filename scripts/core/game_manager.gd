@@ -24,9 +24,9 @@ func initialize_game() -> void:
 
 func connect_signals() -> void:
 	# Game flow signals
-	game_state.phase_changed.connect(_on_phase_changed)
-	game_state.turn_changed.connect(_on_turn_changed)
-	ui_manager.deal_finished.connect(_on_deal_finished)
+	game_state.phase_changed.connect(on_phase_changed)
+	game_state.turn_changed.connect(on_turn_changed)
+	ui_manager.deal_finished.connect(on_deal_finished)
 	
 	# Card movement signals for game logic
 	# game_state.card_moved_to_field.connect(_on_card_moved_to_field)
@@ -38,8 +38,8 @@ func connect_signals() -> void:
 	# game_state.points_awarded.connect(_on_points_awarded)
 	
 	# Model events - Controller translates to UI actions
-	game_state.deck_initialized.connect(_on_deck_initialized)
-	game_state.card_moved.connect(_on_card_moved)
+	game_state.deck_initialized.connect(on_deck_initialized)
+	game_state.card_moved.connect(on_card_moved)
 	game_state.player_selected_card.connect(on_player_selected_card)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
@@ -48,7 +48,7 @@ func connect_signals() -> void:
 
 
 # Game flow signal handlers
-func _on_phase_changed(new_phase: GameState.Phase) -> void:
+func on_phase_changed(new_phase: GameState.Phase) -> void:
 	print("Phase changed to: ", new_phase)
 	match new_phase:
 		GameState.Phase.DEAL:
@@ -63,14 +63,14 @@ func _on_phase_changed(new_phase: GameState.Phase) -> void:
 			game_state.current_turn = GameState.Turn.PLAYER
 
 
-func _on_turn_changed(new_turn: GameState.Turn) -> void:
+func on_turn_changed(new_turn: GameState.Turn) -> void:
 	print("Turn changed to: ", new_turn)
 	if new_turn == GameState.Turn.OPPONENT:
 		# AI will make move here later
 		pass
 
 
-func _on_deal_finished() -> void:
+func on_deal_finished() -> void:
 	game_state.current_phase = GameState.Phase.PLAY
 
 
@@ -80,31 +80,53 @@ func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
 	# Game logic decides what happens
 	if ui_manager.selected_card == clicked_card_visual:
 		# Deselect
-		game_state.player_choose_card(null)
+		game_state.players_chosen_card = null
 	else:
 		# Select new card
-		game_state.player_choose_card(clicked_card_visual.card_data)
+		game_state.players_chosen_card = clicked_card_visual.card_data
 
 
 func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
 	print("GameManager: Player clicked field card: ", clicked_card_visual.card_data)
-	# TODO: Implement card matching logic
-	pass
+	# make sure it's the players turn and they have chosen a card
+	if game_state.is_player_turn() and game_state.players_chosen_card != null:
+		# ensure the clicked card is a correct match
+		var player_card = game_state.players_chosen_card
+		var field_card = clicked_card_visual.card_data
+		print("Field Card clicked Pos: ", clicked_card_visual.get_global_position())
 
+		if player_card.month != field_card.month:
+			print("Clicked field card does not match selected player card month.")
+			return
+		else:
+			print("Player is playing card: %s to match field card: %s" % [player_card, field_card])
+			game_state.players_chosen_card = null
+			game_state.player_captured_cards(player_card, field_card)
+		
 
 # Model event handlers - Controller translates to specific UI actions
-func _on_deck_initialized(deck: Array[Card]) -> void:
+func on_deck_initialized(deck: Array[Card]) -> void:
 	ui_manager.on_deck_setup(deck)
 
 
-func _on_card_moved(card: Card, _from_location: String, to_location: String) -> void:
-	match to_location:
-		"player_hand":
+## Handle card moved events from GameState and pass to UI manager
+## card is the Card instance that moved
+## from_to_location is a string in the format "from_to", e.g. "deck_player_hand"
+## move_also is used when a card is moved to the field and needs to animate
+func on_card_moved(card: Card, from_to_location: String, move_also: Card) -> void:
+	match from_to_location:
+		"deck_player_hand":
 			ui_manager.on_card_dealt_to_player(card)
-		"opponent_hand":
+		"deck_opponent_hand":
 			ui_manager.on_card_dealt_to_opponent(card)
-		"field":
+		"deck_field":
 			ui_manager.on_card_dealt_to_field(card)
+		"player_field_captured":
+			ui_manager.field_captured_by_player(card, move_also)
+		"deck_field_captured":
+			pass
+		"opponent_field_captured":
+			pass
 
 
 func on_player_selected_card(card: Card) -> void:
