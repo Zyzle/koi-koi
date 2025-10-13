@@ -2,7 +2,7 @@ class_name CaptureArea
 extends Node2D
 
 const CARD_REDUCED_SCALE = 0.5
-const CARD_REDUCED_WIDTH = 130 * CARD_REDUCED_SCALE
+const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
 
 @onready var brights: Line = $BrightsLine
 @onready var ribbons: Line = $RibbonsLine

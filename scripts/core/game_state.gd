@@ -75,7 +75,7 @@ func deal_card_to_player() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to player")
 		return
-	var card = deck.pop_front()
+	var card = deck.pop_back()
 	card.make_player_card()
 	player_hand.append(card)
 	card_moved.emit(card, "deck_player_hand", null)
@@ -85,7 +85,7 @@ func deal_card_to_opponent() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to opponent")
 		return
-	var card = deck.pop_front()
+	var card = deck.pop_back()
 	opponent_hand.append(card)
 	card_moved.emit(card, "deck_opponent_hand", null)
 
@@ -94,7 +94,7 @@ func deal_card_to_field() -> void:
 	if deck.size() == 0:
 		print("Deck is empty, cannot deal to field")
 		return
-	var card = deck.pop_front()
+	var card = deck.pop_back()
 	card.make_field_card()
 	field_cards.append(card)
 	card_moved.emit(card, "deck_field", null)
@@ -107,7 +107,13 @@ func is_player_turn() -> bool:
 ## When capturing cards, card1 is the players chosen card, either form their hand
 ## or the top of the deck, card 2 is the field card being captured
 func player_captured_cards(card1: Card, card2: Card) -> void:
-	field_cards.erase(card2)
+	if field_cards.has(card2):
+		# card came from the field
+		field_cards.erase(card2)
+	else:
+		# card came from the deck
+		deck.erase(card2)
+
 	player_captured.append(card2)
 
 	if player_hand.has(card1):
@@ -120,3 +126,13 @@ func player_captured_cards(card1: Card, card2: Card) -> void:
 		deck.erase(card1)
 		player_captured.append(card1)
 		card_moved.emit(card1, "deck_field_captured", card2)
+
+
+func start_deck_move() -> void:
+	var card = deck[deck.size() - 1]
+	# check if card is playable in field, if not add it
+	if not field_cards.any(func(field_card: Card): return field_card.month == card.month):
+		deal_card_to_field()
+	else:
+		deck.erase(card)
+		players_chosen_card = card

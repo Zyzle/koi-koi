@@ -3,12 +3,11 @@ extends Node
 
 const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 
-const CARD_BASE_SIZE = Vector2(110, 180)
 
 @onready var player_hand_container: Hand = %PlayerHand
 @onready var field_container: Field = %Field
 @onready var opponent_hand_container: Hand = %OpponentHand
-@onready var deck_slot: Node2D = %DeckSlot
+@onready var deck_slot: Deck = %DeckSlot
 @onready var player_capture_area: CaptureArea = %PlayerCaptureArea
 @onready var opponent_capture_area: CaptureArea = %OpponentCaptureArea
 
@@ -23,10 +22,6 @@ var selected_card: CardVisual
 
 func set_game_state(state: GameState) -> void:
 	game_state = state
-	
-
-func on_deck_setup(deck: Array[Card]) -> void:
-	setup_deck_display(deck)
 
 
 func setup_deck_display(deck: Array[Card]) -> void:
@@ -40,23 +35,27 @@ func setup_deck_display(deck: Array[Card]) -> void:
 		card_registry[card] = card_visual
 		
 		# Stacking is preferred for Deck
-		deck_slot.add_child(card_visual)
+		deck_slot.add_card(card_visual)
 	
 
 func on_card_dealt_to_player(card: Card) -> void:
 	var card_visual = card_registry[card]
+	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
 	deal_registry.append({card = card_visual, target = player_hand_container})
 
 
 func on_card_dealt_to_field(card: Card) -> void:
 	var card_visual = card_registry[card]
+	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
 	deal_registry.append({card = card_visual, target = field_container})
 
 
 func on_card_dealt_to_opponent(card: Card) -> void:
-	deal_registry.append({card = card_registry[card], target = opponent_hand_container})
+	var card_visual = card_registry[card]
+	deck_slot.remove_card(card_visual)
+	deal_registry.append({card = card_visual, target = opponent_hand_container})
 
 
 func player_selected_card(card: Card) -> void:
@@ -93,6 +92,14 @@ func process_deal_queue() -> void:
 	deal_finished.emit()
 
 
+func move_deck_to_field(card: Card) -> void:
+	var card_visual = get_card_visual(card)
+	deck_slot.remove_card(card_visual)
+	card_visual.connect_events()
+	var tween = field_container.add_card(card_visual, false)
+	await tween.finished
+
+
 func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	var player_card_visual = get_card_visual(player_card)
 	var field_card_visual = get_card_visual(field_card)
@@ -100,12 +107,36 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	player_card_visual.set_selected(false)
 	player_card_visual.unembiggen(true)
 	player_card_visual.disconnect_events()
+	field_container.remove_card(field_card_visual)
 	selected_card = null
 	
 	if player_card_visual:
 		var tween = player_capture_area.capture_card(player_card_visual)
 		await tween.finished
 	
+	if field_card_visual:
+		var tween = player_capture_area.capture_card(field_card_visual)
+		await tween.finished
+
+	deck_slot.get_top_card().flip_card()
+	game_state.start_deck_move()
+
+	# game_state.make_deck_top_playable()
+
+
+func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
+	var deck_card_visual = get_card_visual(deck_card)
+	var field_card_visual = get_card_visual(field_card)
+
+	deck_card_visual.set_selected(false)
+	deck_slot.remove_card(deck_card_visual)
+	field_container.remove_card(field_card_visual)
+	selected_card = null
+
+	if deck_card_visual:
+		var tween = player_capture_area.capture_card(deck_card_visual)
+		await tween.finished
+
 	if field_card_visual:
 		var tween = player_capture_area.capture_card(field_card_visual)
 		await tween.finished
@@ -126,49 +157,3 @@ func create_card_visual(card: Card) -> CardVisual:
 ## Retrieve a CardVisual from the registry
 func get_card_visual(card: Card) -> CardVisual:
 	return card_registry.get(card, null)
-
-
-## Move a card visual from one container to another
-# func move_card_visual(card: Card, target_container: Node2D, animate: bool = true, and_flip: bool = false) -> Tween:
-# 	var card_visual = get_card_visual(card)
-# 	if not card_visual:
-# 		print("Error: No CardVisual found for card: ", card)
-# 		return null
-	
-# 	if animate:
-# 		# Get current global position before reparenting
-# 		var start_pos = card_visual.global_position
-		
-# 		# hide card until animation start
-# 		# card_visual.toggle_visibility(false)
-# 		# Reparent to new container
-# 		var old_parent = card_visual.get_parent()
-# 		if old_parent:
-# 			old_parent.remove_child(card_visual)
-# 		target_container.add_child(card_visual)
-		
-# 		# Let container position the card, then animate from old position
-# 		await get_tree().process_frame # Wait for layout
-# 		var end_pos = card_visual.global_position
-		
-# 		# Animate from old position to new container position
-# 		card_visual.global_position = start_pos
-# 		# unhide card at start of animation
-# 		# card_visual.toggle_visibility(true)
-# 		# ensure card_visual is on top during animation
-# 		card_visual.z_index = 10
-
-# 		if and_flip:
-# 			card_visual.flip_card()
-
-# 		var tween = create_tween()
-# 		tween.tween_property(card_visual, "global_position", end_pos, 0.25)
-# 		return tween
-# 	else:
-# 		# Simple reparenting without animation
-# 		# this may or may not be needed
-# 		var old_parent = card_visual.get_parent()
-# 		if old_parent:
-# 			old_parent.remove_child(card_visual)
-# 		target_container.add_child(card_visual)
-# 		return null

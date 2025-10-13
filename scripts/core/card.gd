@@ -29,3 +29,7 @@ func make_player_card() -> void:
 
 func make_field_card() -> void:
 	is_field_card = true
+
+
+func _to_string():
+	return "Card(month=%d, number=%d, type=%s, points=%d)" % [month, number, str(type), points]

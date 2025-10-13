@@ -8,6 +8,7 @@
 script = ExtResource("1_813a5")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.39215687)
 texture = ExtResource("1_khg73")
 
 [node name="BrightsLine" type="Marker2D" parent="."]

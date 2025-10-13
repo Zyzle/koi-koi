@@ -87,26 +87,22 @@ func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
 
 
 func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
-	print("GameManager: Player clicked field card: ", clicked_card_visual.card_data)
 	# make sure it's the players turn and they have chosen a card
 	if game_state.is_player_turn() and game_state.players_chosen_card != null:
 		# ensure the clicked card is a correct match
 		var player_card = game_state.players_chosen_card
 		var field_card = clicked_card_visual.card_data
-		print("Field Card clicked Pos: ", clicked_card_visual.get_global_position())
 
 		if player_card.month != field_card.month:
-			print("Clicked field card does not match selected player card month.")
 			return
 		else:
-			print("Player is playing card: %s to match field card: %s" % [player_card, field_card])
 			game_state.players_chosen_card = null
 			game_state.player_captured_cards(player_card, field_card)
 		
 
 # Model event handlers - Controller translates to specific UI actions
 func on_deck_initialized(deck: Array[Card]) -> void:
-	ui_manager.on_deck_setup(deck)
+	ui_manager.setup_deck_display(deck)
 
 
 ## Handle card moved events from GameState and pass to UI manager
@@ -120,11 +116,14 @@ func on_card_moved(card: Card, from_to_location: String, move_also: Card) -> voi
 		"deck_opponent_hand":
 			ui_manager.on_card_dealt_to_opponent(card)
 		"deck_field":
-			ui_manager.on_card_dealt_to_field(card)
+			if game_state.current_phase == GameState.Phase.DEAL:
+				ui_manager.on_card_dealt_to_field(card)
+			else:
+				ui_manager.move_deck_to_field(card)
 		"player_field_captured":
 			ui_manager.field_captured_by_player(card, move_also)
 		"deck_field_captured":
-			pass
+			ui_manager.field_captured_by_deck(card, move_also)
 		"opponent_field_captured":
 			pass
 

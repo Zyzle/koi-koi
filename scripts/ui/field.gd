@@ -34,5 +34,14 @@ func add_card(card_visual: CardVisual, _and_flip) -> Tween:
 
 	return null
 
+
+func remove_card(card_visual: CardVisual) -> void:
+	field.erase(card_visual)
+	# Find the slot containing this card and clear it
+	for slot in field_slots:
+		if slot.card_visual == card_visual:
+			slot.card_visual = null
+			break
+
 func get_cards() -> Array[CardVisual]:
 	return field
