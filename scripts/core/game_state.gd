@@ -12,13 +12,24 @@ enum Phase {
 }
 
 enum Turn {
+	NONE,
 	PLAYER,
 	OPPONENT
+}
+
+enum TurnPhase {
+	NONE, # 0
+	HAND_FIELD_CAPTURE, # 1
+	PLAY_CARD_TO_FIELD, # 2
+	FLIP_DECK_CARD, # 3
+	DECK_FIELD_CAPTURE, # 4
+	TURN_END # 5
 }
 
 # Private variables for properties with setters
 var _current_phase: Phase
 var _current_turn: Turn
+var _current_turn_phase: TurnPhase
 var _players_chosen_card: Card
 
 # Properties with automatic signal emission
@@ -35,6 +46,13 @@ var current_turn: Turn:
 		if _current_turn != value:
 			_current_turn = value
 			turn_changed.emit(value)
+
+var current_turn_phase: TurnPhase:
+	get: return _current_turn_phase
+	set(value):
+		if _current_turn_phase != value:
+			_current_turn_phase = value
+			turn_phase_changed.emit(value)
 
 var players_chosen_card: Card:
 	get: return _players_chosen_card
@@ -56,6 +74,7 @@ var opponent_score: int
 # Game Flow Signals
 signal phase_changed(new_phase: Phase)
 signal turn_changed(new_turn: Turn)
+signal turn_phase_changed(new_turn_phase: TurnPhase)
 signal player_selected_card(card: Card)
 
 # Model Events (generic)
@@ -136,3 +155,66 @@ func start_deck_move() -> void:
 	else:
 		deck.erase(card)
 		players_chosen_card = card
+
+
+## Start a new turn for the current player
+func start_turn() -> void:
+	if not is_player_turn():
+		return
+	
+	# Check if player has any cards that can capture from field
+	if can_player_capture_from_field():
+		current_turn_phase = TurnPhase.HAND_FIELD_CAPTURE
+	else:
+		current_turn_phase = TurnPhase.PLAY_CARD_TO_FIELD
+
+
+## Check if the current player has any cards that can capture from the field
+func can_player_capture_from_field() -> bool:
+	for hand_card in player_hand:
+		for field_card in field_cards:
+			if hand_card.month == field_card.month:
+				return true
+	return false
+
+
+## Check if a specific card can capture from the field
+func can_card_capture_from_field(card: Card) -> bool:
+	for field_card in field_cards:
+		if card.month == field_card.month:
+			return true
+	return false
+
+
+## Advance to the next phase of the turn
+func advance_turn_phase() -> void:
+	match current_turn_phase:
+		TurnPhase.HAND_FIELD_CAPTURE:
+			# Player made a capture, now flip deck card
+			current_turn_phase = TurnPhase.FLIP_DECK_CARD
+			
+		TurnPhase.PLAY_CARD_TO_FIELD:
+			# Player played card to field, now flip deck card
+			current_turn_phase = TurnPhase.FLIP_DECK_CARD
+			
+		TurnPhase.FLIP_DECK_CARD:
+			# Check if deck card can capture
+			var deck_card = deck[deck.size() - 1]
+			if can_card_capture_from_field(deck_card):
+				current_turn_phase = TurnPhase.DECK_FIELD_CAPTURE
+			else:
+				# Deck card goes to field, turn ends
+				deal_card_to_field()
+				current_turn_phase = TurnPhase.TURN_END
+				
+		TurnPhase.DECK_FIELD_CAPTURE:
+			# Deck capture completed, turn ends
+			current_turn_phase = TurnPhase.TURN_END
+			
+		TurnPhase.TURN_END:
+			# Switch to opponent turn
+			if current_turn == Turn.PLAYER:
+				current_turn = Turn.OPPONENT
+			else:
+				current_turn = Turn.PLAYER
+				start_turn()

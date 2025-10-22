@@ -26,6 +26,7 @@ func connect_signals() -> void:
 	# Game flow signals
 	game_state.phase_changed.connect(on_phase_changed)
 	game_state.turn_changed.connect(on_turn_changed)
+	game_state.turn_phase_changed.connect(on_turn_phase_changed)
 	ui_manager.deal_finished.connect(on_deal_finished)
 	
 	# Card movement signals for game logic
@@ -65,9 +66,41 @@ func on_phase_changed(new_phase: GameState.Phase) -> void:
 
 func on_turn_changed(new_turn: GameState.Turn) -> void:
 	print("Turn changed to: ", new_turn)
-	if new_turn == GameState.Turn.OPPONENT:
+	if new_turn == GameState.Turn.PLAYER:
+		# Start the player's turn sequence
+		game_state.start_turn()
+	elif new_turn == GameState.Turn.OPPONENT:
 		# AI will make move here later
-		pass
+		# switch back to players turn for now
+		game_state.current_turn = GameState.Turn.PLAYER
+
+
+func on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
+	print("Turn phase changed to: ", new_turn_phase)
+	match new_turn_phase:
+		GameState.TurnPhase.HAND_FIELD_CAPTURE:
+			print("Player can capture from field - waiting for selection")
+			ui_manager.set_capture_mode(true)
+			
+		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
+			print("Player must play a card to field - waiting for selection")
+			ui_manager.set_play_to_field_mode()
+			
+		GameState.TurnPhase.FLIP_DECK_CARD:
+			print("Flipping deck card")
+			ui_manager.flip_deck_card()
+			# Automatically advance after animation
+			await get_tree().create_timer(1.0).timeout
+			game_state.advance_turn_phase()
+			
+		GameState.TurnPhase.DECK_FIELD_CAPTURE:
+			print("Deck card can capture - waiting for field selection")
+			ui_manager.set_deck_capture_mode()
+			
+		GameState.TurnPhase.TURN_END:
+			print("Turn ending")
+			ui_manager.end_turn_cleanup()
+			game_state.advance_turn_phase()
 
 
 func on_deal_finished() -> void:
@@ -77,27 +110,75 @@ func on_deal_finished() -> void:
 # Controller methods - handle user input and decide what to do
 func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
 	print("GameManager: Player clicked card: ", clicked_card_visual.card_data)
+	
+	# Only allow card selection during appropriate turn phases
+	if not (game_state.current_turn_phase == GameState.TurnPhase.HAND_FIELD_CAPTURE or
+			game_state.current_turn_phase == GameState.TurnPhase.PLAY_CARD_TO_FIELD):
+		print("Wrong phase for selecting card")
+		return
+	
 	# Game logic decides what happens
 	if ui_manager.selected_card == clicked_card_visual:
 		# Deselect
 		game_state.players_chosen_card = null
 	else:
 		# Select new card
+		print("Selecting card for action")
 		game_state.players_chosen_card = clicked_card_visual.card_data
 
 
 func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
-	# make sure it's the players turn and they have chosen a card
-	if game_state.is_player_turn() and game_state.players_chosen_card != null:
-		# ensure the clicked card is a correct match
-		var player_card = game_state.players_chosen_card
-		var field_card = clicked_card_visual.card_data
+	# Handle different scenarios based on turn phase
+	match game_state.current_turn_phase:
+		GameState.TurnPhase.HAND_FIELD_CAPTURE:
+			# Player is capturing with a hand card
+			if game_state.players_chosen_card != null:
+				var player_card = game_state.players_chosen_card
+				var field_card = clicked_card_visual.card_data
+				
+				if player_card.month == field_card.month:
+					game_state.players_chosen_card = null
+					game_state.player_captured_cards(player_card, field_card)
+					# Advance to deck flip phase
+					game_state.advance_turn_phase()
+			
+		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
+			# This shouldn't happen - player should play to field, not capture
+			print("Cannot capture during PLAY_CARD_TO_FIELD phase")
 
-		if player_card.month != field_card.month:
-			return
-		else:
-			game_state.players_chosen_card = null
-			game_state.player_captured_cards(player_card, field_card)
+		GameState.TurnPhase.DECK_FIELD_CAPTURE:
+			# Player is capturing with the deck card
+			var deck_card = game_state.deck[game_state.deck.size() - 1]
+			var field_card = clicked_card_visual.card_data
+			
+			if deck_card.month == field_card.month:
+				game_state.player_captured_cards(deck_card, field_card)
+				# End turn
+				game_state.advance_turn_phase()
+
+
+## Handle when player plays a card to the field (no capture possible)
+func play_card_to_field(card: Card) -> void:
+	if game_state.current_turn_phase != GameState.TurnPhase.PLAY_CARD_TO_FIELD:
+		return
+	
+	if not game_state.player_hand.has(card):
+		return
+		
+	# Move card from hand to field
+	game_state.player_hand.erase(card)
+	card.make_field_card()
+	game_state.field_cards.append(card)
+	game_state.card_moved.emit(card, "player_hand_field", null)
+	
+	# Clear selection and advance to deck flip
+	game_state.players_chosen_card = null
+	game_state.advance_turn_phase()
+
+
+## This method is called when a card moves from player hand to field
+func player_card_to_field(card: Card) -> void:
+	ui_manager.player_card_to_field(card)
 		
 
 # Model event handlers - Controller translates to specific UI actions
@@ -122,6 +203,8 @@ func on_card_moved(card: Card, from_to_location: String, move_also: Card) -> voi
 				ui_manager.move_deck_to_field(card)
 		"player_field_captured":
 			ui_manager.field_captured_by_player(card, move_also)
+		"player_hand_field":
+			player_card_to_field(card)
 		"deck_field_captured":
 			ui_manager.field_captured_by_deck(card, move_also)
 		"opponent_field_captured":

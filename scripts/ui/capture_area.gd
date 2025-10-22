@@ -25,6 +25,7 @@ func capture_card(card_visual: CardVisual) -> Tween:
 
 
 func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) -> Tween:
+	card_visual.remove_highlight()
 	var target_index = target_container.card_count()
 	var target_local_position = Vector2(target_index * CARD_REDUCED_WIDTH, 0)
 	var start_global_pos = card_visual.global_position

@@ -38,3 +38,23 @@ script = ExtResource("3_lptdg")
 [node name="Slot8" parent="." instance=ExtResource("1_vtb3u")]
 position = Vector2(195, 105)
 script = ExtResource("3_lptdg")
+
+[node name="Slot9" parent="." instance=ExtResource("1_vtb3u")]
+visible = false
+position = Vector2(325, -105)
+script = ExtResource("3_lptdg")
+
+[node name="Slot10" parent="." instance=ExtResource("1_vtb3u")]
+visible = false
+position = Vector2(325, 105)
+script = ExtResource("3_lptdg")
+
+[node name="Slot11" parent="." instance=ExtResource("1_vtb3u")]
+visible = false
+position = Vector2(455, -105)
+script = ExtResource("3_lptdg")
+
+[node name="Slot12" parent="." instance=ExtResource("1_vtb3u")]
+visible = false
+position = Vector2(455, 105)
+script = ExtResource("3_lptdg")

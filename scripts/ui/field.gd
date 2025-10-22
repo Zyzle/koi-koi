@@ -12,6 +12,10 @@ var field: Array[CardVisual] = []
 	$Slot6,
 	$Slot7,
 	$Slot8,
+	$Slot9, # extra, starts hidden
+	$Slot10, # extra, starts hidden
+	$Slot11, # extra, starts hidden
+	$Slot12 # extra, starts hidden
 ]
 
 
@@ -43,5 +47,32 @@ func remove_card(card_visual: CardVisual) -> void:
 			slot.card_visual = null
 			break
 
+
 func get_cards() -> Array[CardVisual]:
 	return field
+
+
+func all_slots_occupied() -> bool:
+	for slot in field_slots.filter(func(s): return s.visible):
+		if not slot.is_occupied():
+			return false
+	return true
+
+
+func show_extra_slots() -> void:
+	$Slot9.visible = true
+	$Slot10.visible = true
+
+
+func highlight_available_slot() -> void:
+	if all_slots_occupied():
+		show_extra_slots()
+	for slot in field_slots:
+		if not slot.is_occupied():
+			slot.apply_highlight()
+			return
+
+
+func clear_all_highlights() -> void:
+	for slot in field_slots:
+		slot.remove_highlight()

@@ -12,6 +12,7 @@ const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 @onready var opponent_capture_area: CaptureArea = %OpponentCaptureArea
 
 signal deal_finished();
+# signal 
 
 var game_manager: GameManager
 var game_state: GameState
@@ -59,7 +60,7 @@ func on_card_dealt_to_opponent(card: Card) -> void:
 
 
 func player_selected_card(card: Card) -> void:
-# 	# Update visual selection state
+	# Update visual selection state
 	if selected_card:
 		selected_card.set_selected(false)
 	
@@ -69,10 +70,28 @@ func player_selected_card(card: Card) -> void:
 		if card_visual:
 			card_visual.set_selected(true)
 			selected_card = card_visual
+			
+			# Auto-play to field if in PLAY_CARD_TO_FIELD phase
+			if game_state.current_turn_phase == GameState.TurnPhase.PLAY_CARD_TO_FIELD:
+				# Automatically play the selected card to field since no capture is possible
+				print("Auto-playing card to field: ", card)
+				game_manager.play_card_to_field(card)
+				return
+			else:
+				print("not playing card to field, state:", game_state.current_turn_phase)
 	else:
 		selected_card = null
 		
-	# Highlight matching field cards
+	# Highlight matching field cards (only during capture phases)
+	if game_state.current_turn_phase == GameState.TurnPhase.HAND_FIELD_CAPTURE:
+		highlight_matching_field_cards(card)
+	else:
+		# Clear all highlights if not in capture mode
+		for child in field_container.get_cards():
+			child.remove_highlight()
+
+
+func highlight_matching_field_cards(card: Card) -> void:
 	for child in field_container.get_cards():
 		var card_visual = child
 		if card == null:
@@ -100,6 +119,19 @@ func move_deck_to_field(card: Card) -> void:
 	await tween.finished
 
 
+## Handle when player plays a card from hand to field
+func player_card_to_field(card: Card) -> void:
+	var card_visual = get_card_visual(card)
+	if card_visual:
+		card_visual.set_selected(false)
+		card_visual.disconnect_events()
+		player_hand_container.remove_card(card_visual)
+		var tween = field_container.add_card(card_visual, false)
+		await tween.finished
+		card_visual.connect_events()
+	selected_card = null
+
+
 func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	var player_card_visual = get_card_visual(player_card)
 	var field_card_visual = get_card_visual(field_card)
@@ -108,6 +140,7 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	player_card_visual.unembiggen(true)
 	player_card_visual.disconnect_events()
 	field_container.remove_card(field_card_visual)
+	player_hand_container.remove_card(player_card_visual)
 	selected_card = null
 	
 	if player_card_visual:
@@ -118,10 +151,7 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 		var tween = player_capture_area.capture_card(field_card_visual)
 		await tween.finished
 
-	deck_slot.get_top_card().flip_card()
-	game_state.start_deck_move()
-
-	# game_state.make_deck_top_playable()
+	# game_state.start_deck_move()
 
 
 func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
@@ -157,3 +187,44 @@ func create_card_visual(card: Card) -> CardVisual:
 ## Retrieve a CardVisual from the registry
 func get_card_visual(card: Card) -> CardVisual:
 	return card_registry.get(card, null)
+
+
+## Set UI state for capture mode (player can capture from field)
+func set_capture_mode(enabled: bool) -> void:
+	print("UI: Capture mode ", "enabled" if enabled else "disabled")
+	# Could add visual indicators here
+
+
+## Set UI state for playing cards to field (no capture possible)
+func set_play_to_field_mode() -> void:
+	# Could add visual indicators here
+	field_container.highlight_available_slot()
+
+
+## Set UI state for deck capture mode (deck card can capture)
+func set_deck_capture_mode() -> void:
+	print("UI: Deck capture mode enabled")
+	# Could add visual indicators or highlight deck card
+	var top_card = deck_slot.get_top_card()
+	top_card.set_selected(true)
+	highlight_matching_field_cards(top_card.card_data)
+
+
+## Flip the top deck card
+func flip_deck_card() -> void:
+	print("UI: Flipping deck card")
+	var top_card = deck_slot.get_top_card()
+	if top_card:
+		top_card.flip_card()
+
+
+## Clean up UI state at end of turn
+func end_turn_cleanup() -> void:
+	print("UI: Cleaning up turn")
+	if selected_card:
+		selected_card.set_selected(false)
+		selected_card = null
+	
+	# Remove all field card highlights
+	for card_visual in field_container.get_cards():
+		card_visual.remove_highlight()
