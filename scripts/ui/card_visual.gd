@@ -19,6 +19,26 @@ var is_selected: bool = false
 signal player_card_clicked(card_visual: CardVisual)
 signal field_card_clicked(card_visual: CardVisual)
 
+func _on_area_2d_mouse_exited():
+	if _card_data.is_player_card and is_player_turn() and not is_selected:
+		var shrink = unembiggen()
+		await shrink.finished
+
+
+func _on_area_2d_mouse_entered():
+	if _card_data.is_player_card and is_player_turn():
+		var grow = embiggen()
+		await grow.finished
+
+
+func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _card_data.is_player_card and is_player_turn():
+			player_card_clicked.emit(self)
+		if _card_data.is_field_card and is_player_turn():
+			field_card_clicked.emit(self)
+		# Emit signal or handle card click logic here
+
 
 func connect_events():
 	$Area2D.mouse_entered.connect(_on_area_2d_mouse_entered)
@@ -87,23 +107,3 @@ func set_selected(s: bool) -> void:
 		remove_highlight()
 		var shrink = unembiggen()
 		await shrink.finished
-
-func _on_area_2d_mouse_exited():
-	if _card_data.is_player_card and is_player_turn() and not is_selected:
-		var shrink = unembiggen()
-		await shrink.finished
-
-
-func _on_area_2d_mouse_entered():
-	if _card_data.is_player_card and is_player_turn():
-		var grow = embiggen()
-		await grow.finished
-
-
-func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _card_data.is_player_card and is_player_turn():
-			player_card_clicked.emit(self)
-		if _card_data.is_field_card and is_player_turn():
-			field_card_clicked.emit(self)
-		# Emit signal or handle card click logic here

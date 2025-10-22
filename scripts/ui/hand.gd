@@ -5,6 +5,13 @@ const CARD_SPACING = 130 # Actual spacing between card centers
 
 var hand: Array[CardVisual] = []
 
+func _tighten_hand_layout() -> void:
+	for i in range(hand.size()):
+		var target_position = Vector2(i * CARD_SPACING, 0)
+		var card_visual = hand[i]
+		var tween = get_tree().create_tween()
+		tween.tween_property(card_visual, "position", target_position, 0.25)
+
 
 func add_card(card_visual: CardVisual, and_flip: bool = false) -> Tween:
 	var target_index = hand.size()
@@ -29,12 +36,4 @@ func add_card(card_visual: CardVisual, and_flip: bool = false) -> Tween:
 func remove_card(card_visual: CardVisual) -> void:
 	if hand.has(card_visual):
 		hand.erase(card_visual)
-		tighten_hand_layout()
-
-
-func tighten_hand_layout() -> void:
-	for i in range(hand.size()):
-		var target_position = Vector2(i * CARD_SPACING, 0)
-		var card_visual = hand[i]
-		var tween = get_tree().create_tween()
-		tween.tween_property(card_visual, "position", target_position, 0.25)
+		_tighten_hand_layout()

@@ -20,6 +20,33 @@ var card_registry: Dictionary[Card, CardVisual]
 var deal_registry: Array[Dictionary]
 var selected_card: CardVisual
 
+func _create_card_visual(card: Card) -> CardVisual:
+	var card_scene = preload(CARD_SCENE_PATH)
+	var card_visual: CardVisual = card_scene.instantiate()
+	card_visual.card_data = card
+	
+	# Pass GameState if CardVisual needs it
+	if game_state:
+		card_visual.set_game_state(game_state)
+	
+	return card_visual
+
+
+## Retrieve a CardVisual from the registry
+func _get_card_visual(card: Card) -> CardVisual:
+	return card_registry.get(card, null)
+
+
+func _highlight_matching_field_cards(card: Card) -> void:
+	for child in field_container.get_cards():
+		var card_visual = child
+		if card == null:
+			card_visual.remove_highlight()
+		elif card_visual.card_data.month == card.month:
+			card_visual.apply_highlight()
+		else:
+			card_visual.remove_highlight()
+
 
 func set_game_state(state: GameState) -> void:
 	game_state = state
@@ -29,7 +56,7 @@ func setup_deck_display(deck: Array[Card]) -> void:
 	# Create all card visuals but keep them invisible initially
 	# This prevents stacking issues in the deck container
 	for card in deck:
-		var card_visual = create_card_visual(card)
+		var card_visual = _create_card_visual(card)
 		# Connect directly to GameManager (Controller) instead of UIManager
 		card_visual.player_card_clicked.connect(game_manager.on_player_card_clicked)
 		card_visual.field_card_clicked.connect(game_manager.on_field_card_clicked)
@@ -39,21 +66,21 @@ func setup_deck_display(deck: Array[Card]) -> void:
 		deck_slot.add_card(card_visual)
 	
 
-func on_card_dealt_to_player(card: Card) -> void:
+func card_dealt_to_player(card: Card) -> void:
 	var card_visual = card_registry[card]
 	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
 	deal_registry.append({card = card_visual, target = player_hand_container})
 
 
-func on_card_dealt_to_field(card: Card) -> void:
+func card_dealt_to_field(card: Card) -> void:
 	var card_visual = card_registry[card]
 	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
 	deal_registry.append({card = card_visual, target = field_container})
 
 
-func on_card_dealt_to_opponent(card: Card) -> void:
+func card_dealt_to_opponent(card: Card) -> void:
 	var card_visual = card_registry[card]
 	deck_slot.remove_card(card_visual)
 	deal_registry.append({card = card_visual, target = opponent_hand_container})
@@ -66,7 +93,7 @@ func player_selected_card(card: Card) -> void:
 	
 	if card:
 		# Find and select the new card
-		var card_visual = get_card_visual(card)
+		var card_visual = _get_card_visual(card)
 		if card_visual:
 			card_visual.set_selected(true)
 			selected_card = card_visual
@@ -84,22 +111,11 @@ func player_selected_card(card: Card) -> void:
 		
 	# Highlight matching field cards (only during capture phases)
 	if game_state.current_turn_phase == GameState.TurnPhase.HAND_FIELD_CAPTURE:
-		highlight_matching_field_cards(card)
+		_highlight_matching_field_cards(card)
 	else:
 		# Clear all highlights if not in capture mode
 		for child in field_container.get_cards():
 			child.remove_highlight()
-
-
-func highlight_matching_field_cards(card: Card) -> void:
-	for child in field_container.get_cards():
-		var card_visual = child
-		if card == null:
-			card_visual.remove_highlight()
-		elif card_visual.card_data.month == card.month:
-			card_visual.apply_highlight()
-		else:
-			card_visual.remove_highlight()
 
 
 func process_deal_queue() -> void:
@@ -112,7 +128,7 @@ func process_deal_queue() -> void:
 
 
 func move_deck_to_field(card: Card) -> void:
-	var card_visual = get_card_visual(card)
+	var card_visual = _get_card_visual(card)
 	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
 	var tween = field_container.add_card(card_visual, false)
@@ -121,7 +137,7 @@ func move_deck_to_field(card: Card) -> void:
 
 ## Handle when player plays a card from hand to field
 func player_card_to_field(card: Card) -> void:
-	var card_visual = get_card_visual(card)
+	var card_visual = _get_card_visual(card)
 	if card_visual:
 		card_visual.set_selected(false)
 		card_visual.disconnect_events()
@@ -133,8 +149,8 @@ func player_card_to_field(card: Card) -> void:
 
 
 func field_captured_by_player(player_card: Card, field_card: Card) -> void:
-	var player_card_visual = get_card_visual(player_card)
-	var field_card_visual = get_card_visual(field_card)
+	var player_card_visual = _get_card_visual(player_card)
+	var field_card_visual = _get_card_visual(field_card)
 
 	player_card_visual.set_selected(false)
 	player_card_visual.unembiggen(true)
@@ -155,8 +171,8 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 
 
 func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
-	var deck_card_visual = get_card_visual(deck_card)
-	var field_card_visual = get_card_visual(field_card)
+	var deck_card_visual = _get_card_visual(deck_card)
+	var field_card_visual = _get_card_visual(field_card)
 
 	deck_card_visual.set_selected(false)
 	deck_slot.remove_card(deck_card_visual)
@@ -172,26 +188,9 @@ func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
 		await tween.finished
 
 
-func create_card_visual(card: Card) -> CardVisual:
-	var card_scene = preload(CARD_SCENE_PATH)
-	var card_visual: CardVisual = card_scene.instantiate()
-	card_visual.card_data = card
-	
-	# Pass GameState if CardVisual needs it
-	if game_state:
-		card_visual.set_game_state(game_state)
-	
-	return card_visual
-
-
-## Retrieve a CardVisual from the registry
-func get_card_visual(card: Card) -> CardVisual:
-	return card_registry.get(card, null)
-
-
 ## Set UI state for capture mode (player can capture from field)
-func set_capture_mode(enabled: bool) -> void:
-	print("UI: Capture mode ", "enabled" if enabled else "disabled")
+func set_capture_mode() -> void:
+	print("UI: Capture mode enabled")
 	# Could add visual indicators here
 
 
@@ -207,7 +206,7 @@ func set_deck_capture_mode() -> void:
 	# Could add visual indicators or highlight deck card
 	var top_card = deck_slot.get_top_card()
 	top_card.set_selected(true)
-	highlight_matching_field_cards(top_card.card_data)
+	_highlight_matching_field_cards(top_card.card_data)
 
 
 ## Flip the top deck card

@@ -9,21 +9,6 @@ const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
 @onready var animals: Line = $AnimalsLine
 @onready var plains: Line = $PlainsLine
 
-
-func capture_card(card_visual: CardVisual) -> Tween:
-	match card_visual.card_data.type:
-		Card.CardType.BRIGHT:
-			return _animate_card_capture(card_visual, brights)
-		Card.CardType.RIBBON:
-			return _animate_card_capture(card_visual, ribbons)
-		Card.CardType.ANIMAL:
-			return _animate_card_capture(card_visual, animals)
-		Card.CardType.PLAIN:
-			return _animate_card_capture(card_visual, plains)
-
-	return null
-
-
 func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) -> Tween:
 	card_visual.remove_highlight()
 	var target_index = target_container.card_count()
@@ -37,3 +22,17 @@ func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) ->
 	tween.tween_property(card_visual, "position", target_local_position, 0.25)
 	tween.parallel().tween_property(card_visual, "scale", card_visual.scale * CARD_REDUCED_SCALE, 0.25)
 	return tween
+	
+
+func capture_card(card_visual: CardVisual) -> Tween:
+	match card_visual.card_data.type:
+		Card.CardType.BRIGHT:
+			return _animate_card_capture(card_visual, brights)
+		Card.CardType.RIBBON:
+			return _animate_card_capture(card_visual, ribbons)
+		Card.CardType.ANIMAL:
+			return _animate_card_capture(card_visual, animals)
+		Card.CardType.PLAIN:
+			return _animate_card_capture(card_visual, plains)
+
+	return null
