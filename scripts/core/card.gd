@@ -25,10 +25,12 @@ func _init(m: int, n: int, t: CardType, p: int) -> void:
 
 
 func make_player_card() -> void:
+	is_field_card = false
 	is_player_card = true
 
 
 func make_field_card() -> void:
+	is_player_card = false
 	is_field_card = true
 
 

@@ -59,14 +59,16 @@ func all_slots_occupied() -> bool:
 	return true
 
 
-func show_extra_slots() -> void:
-	$Slot9.visible = true
-	$Slot10.visible = true
+func open_next_slot() -> void:
+	for slot in field_slots:
+		if not slot.visible:
+			slot.visible = true
+			return
 
 
 func highlight_available_slot() -> void:
 	if all_slots_occupied():
-		show_extra_slots()
+		open_next_slot()
 	for slot in field_slots:
 		if not slot.is_occupied():
 			slot.apply_highlight()

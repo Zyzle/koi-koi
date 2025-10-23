@@ -214,11 +214,8 @@ func play_card_to_field(card: Card) -> void:
 		return
 		
 	# Move card from hand to field
-	game_state.player_hand.erase(card)
-	card.make_field_card()
-	game_state.field_cards.append(card)
-	game_state.card_moved.emit(card, "player_hand_field", null)
-	
+	game_state.player_card_to_field(card)
+
 	# Clear selection and advance to deck flip
 	game_state.players_chosen_card = null
 	game_state.advance_turn_phase()

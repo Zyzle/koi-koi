@@ -101,8 +101,9 @@ func player_selected_card(card: Card) -> void:
 			# Auto-play to field if in PLAY_CARD_TO_FIELD phase
 			if game_state.current_turn_phase == GameState.TurnPhase.PLAY_CARD_TO_FIELD:
 				# Automatically play the selected card to field since no capture is possible
-				print("Auto-playing card to field: ", card)
 				game_manager.play_card_to_field(card)
+				card_visual.set_selected(false)
+				selected_card = null
 				return
 			else:
 				print("not playing card to field, state:", game_state.current_turn_phase)
@@ -131,6 +132,8 @@ func move_deck_to_field(card: Card) -> void:
 	var card_visual = _get_card_visual(card)
 	deck_slot.remove_card(card_visual)
 	card_visual.connect_events()
+	if field_container.all_slots_occupied():
+		field_container.open_next_slot()
 	var tween = field_container.add_card(card_visual, false)
 	await tween.finished
 
@@ -145,6 +148,7 @@ func player_card_to_field(card: Card) -> void:
 		var tween = field_container.add_card(card_visual, false)
 		await tween.finished
 		card_visual.connect_events()
+		field_container.clear_all_highlights()
 	selected_card = null
 
 

@@ -147,6 +147,14 @@ func player_captured_cards(card1: Card, card2: Card) -> void:
 		card_moved.emit(card1, "deck_field_captured", card2)
 
 
+func player_card_to_field(card: Card) -> void:
+	if player_hand.has(card):
+		player_hand.erase(card)
+		field_cards.append(card)
+		card.make_field_card()
+		card_moved.emit(card, "player_hand_field", null)
+
+
 func start_deck_move() -> void:
 	var card = deck[deck.size() - 1]
 	# check if card is playable in field, if not add it
