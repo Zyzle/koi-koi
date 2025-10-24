@@ -12,7 +12,6 @@ const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 @onready var opponent_capture_area: CaptureArea = %OpponentCaptureArea
 
 signal deal_finished();
-# signal 
 
 var game_manager: GameManager
 var game_state: GameState
@@ -170,8 +169,6 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	if field_card_visual:
 		var tween = player_capture_area.capture_card(field_card_visual)
 		await tween.finished
-
-	# game_state.start_deck_move()
 
 
 func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:

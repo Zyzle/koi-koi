@@ -16,7 +16,7 @@ const BASE_DECK: Array[Dictionary] = [
 	{"month": 3, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 3, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 3, "number": 3, "type": Card.CardType.RIBBON, "points": 5},
-	{"month": 3, "number": 4, "type": Card.CardType.BRIGHT, "points": 20},
+	{"month": 3, "number": 4, "type": Card.CardType.BRIGHT, "points": 20}, # cherry blossom
 	# April
 	{"month": 4, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 4, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
@@ -31,32 +31,32 @@ const BASE_DECK: Array[Dictionary] = [
 	{"month": 6, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 6, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 6, "number": 3, "type": Card.CardType.RIBBON, "points": 5},
-	{"month": 6, "number": 4, "type": Card.CardType.ANIMAL, "points": 10},
+	{"month": 6, "number": 4, "type": Card.CardType.ANIMAL, "points": 10}, # butterflies
 	# July
 	{"month": 7, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 7, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 7, "number": 3, "type": Card.CardType.RIBBON, "points": 5},
-	{"month": 7, "number": 4, "type": Card.CardType.ANIMAL, "points": 10},
+	{"month": 7, "number": 4, "type": Card.CardType.ANIMAL, "points": 10}, # boar
 	# August
 	{"month": 8, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 8, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 8, "number": 3, "type": Card.CardType.ANIMAL, "points": 10},
-	{"month": 8, "number": 4, "type": Card.CardType.BRIGHT, "points": 20},
+	{"month": 8, "number": 4, "type": Card.CardType.BRIGHT, "points": 20}, # moon
 	# September
 	{"month": 9, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 9, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 9, "number": 3, "type": Card.CardType.RIBBON, "points": 5},
-	{"month": 9, "number": 4, "type": Card.CardType.ANIMAL, "points": 10},
+	{"month": 9, "number": 4, "type": Card.CardType.ANIMAL, "points": 10}, # sake cup
 	# October
 	{"month": 10, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 10, "number": 2, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 10, "number": 3, "type": Card.CardType.RIBBON, "points": 5},
-	{"month": 10, "number": 4, "type": Card.CardType.ANIMAL, "points": 10},
+	{"month": 10, "number": 4, "type": Card.CardType.ANIMAL, "points": 10}, # deer
 	# November
 	{"month": 11, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 11, "number": 2, "type": Card.CardType.RIBBON, "points": 5},
 	{"month": 11, "number": 3, "type": Card.CardType.ANIMAL, "points": 10},
-	{"month": 11, "number": 4, "type": Card.CardType.BRIGHT, "points": 20},
+	{"month": 11, "number": 4, "type": Card.CardType.BRIGHT, "points": 20}, # rain man
 	# December
 	{"month": 12, "number": 1, "type": Card.CardType.PLAIN, "points": 0},
 	{"month": 12, "number": 2, "type": Card.CardType.PLAIN, "points": 0},

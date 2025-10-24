@@ -7,7 +7,6 @@ enum Phase {
 	DEAL,
 	PLAY,
 	DRAW,
-	SCORE,
 	ROUND_END
 }
 
@@ -23,7 +22,8 @@ enum TurnPhase {
 	PLAY_CARD_TO_FIELD, # 2
 	FLIP_DECK_CARD, # 3
 	DECK_FIELD_CAPTURE, # 4
-	TURN_END # 5
+	SCORE, # 5
+	TURN_END # 6
 }
 
 # Private variables for properties with setters
@@ -213,10 +213,14 @@ func advance_turn_phase() -> void:
 			else:
 				# Deck card goes to field, turn ends
 				deal_card_to_field()
-				current_turn_phase = TurnPhase.TURN_END
+				current_turn_phase = TurnPhase.SCORE
 				
 		TurnPhase.DECK_FIELD_CAPTURE:
 			# Deck capture completed, turn ends
+			current_turn_phase = TurnPhase.SCORE
+
+		TurnPhase.SCORE:
+			# Scoring completed, turn ends
 			current_turn_phase = TurnPhase.TURN_END
 			
 		TurnPhase.TURN_END:

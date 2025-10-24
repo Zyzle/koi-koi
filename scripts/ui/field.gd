@@ -19,6 +19,7 @@ var field: Array[CardVisual] = []
 ]
 
 
+## Animate the given card visual to the field
 func add_card(card_visual: CardVisual, _and_flip) -> Tween:
 	for slot in field_slots:
 		if not slot.is_occupied():
@@ -39,6 +40,7 @@ func add_card(card_visual: CardVisual, _and_flip) -> Tween:
 	return null
 
 
+## Remove a CardVisual from the field
 func remove_card(card_visual: CardVisual) -> void:
 	field.erase(card_visual)
 	# Find the slot containing this card and clear it
@@ -48,10 +50,12 @@ func remove_card(card_visual: CardVisual) -> void:
 			break
 
 
+## Retrieve all cards currently in the field
 func get_cards() -> Array[CardVisual]:
 	return field
 
 
+## check if all currently visible slots have cards
 func all_slots_occupied() -> bool:
 	for slot in field_slots.filter(func(s): return s.visible):
 		if not slot.is_occupied():
@@ -59,6 +63,7 @@ func all_slots_occupied() -> bool:
 	return true
 
 
+## Open the next hidden slot if available
 func open_next_slot() -> void:
 	for slot in field_slots:
 		if not slot.visible:
@@ -66,6 +71,7 @@ func open_next_slot() -> void:
 			return
 
 
+## Highlight the next available slot, open a new one if all are occupied
 func highlight_available_slot() -> void:
 	if all_slots_occupied():
 		open_next_slot()
@@ -75,6 +81,7 @@ func highlight_available_slot() -> void:
 			return
 
 
+## Remove highlights from all slots
 func clear_all_highlights() -> void:
 	for slot in field_slots:
 		slot.remove_highlight()

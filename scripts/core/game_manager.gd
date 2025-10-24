@@ -110,6 +110,17 @@ func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
 		GameState.TurnPhase.DECK_FIELD_CAPTURE:
 			print("Deck card can capture - waiting for field selection")
 			ui_manager.set_deck_capture_mode()
+
+		GameState.TurnPhase.SCORE:
+			print("Calculating scores")
+			var turn_scores
+			if game_state.current_turn == GameState.Turn.PLAYER:
+				turn_scores = Scoring.calculate_score(game_state.player_captured)
+			else:
+				turn_scores = Scoring.calculate_score(game_state.opponent_captured)
+
+			print("Turn scores: ", turn_scores)
+			game_state.advance_turn_phase()
 			
 		GameState.TurnPhase.TURN_END:
 			print("Turn ending")
