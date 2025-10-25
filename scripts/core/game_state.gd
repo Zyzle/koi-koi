@@ -80,6 +80,7 @@ signal player_selected_card(card: Card)
 # Model Events (generic)
 signal card_moved(card: Card, from_to_location: String, move_also: Card)
 signal deck_initialized(deck: Array[Card])
+signal capture_numbers_updated(for_turn: Turn, cards: Array[Card])
 
 
 ## Add a set of `Card` instances to the deck and shuffle
@@ -145,6 +146,8 @@ func player_captured_cards(card1: Card, card2: Card) -> void:
 		deck.erase(card1)
 		player_captured.append(card1)
 		card_moved.emit(card1, "deck_field_captured", card2)
+
+	capture_numbers_updated.emit(Turn.PLAYER, player_captured)
 
 
 func player_card_to_field(card: Card) -> void:

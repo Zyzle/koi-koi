@@ -8,6 +8,10 @@ const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
 @onready var ribbons: Line = $RibbonsLine
 @onready var animals: Line = $AnimalsLine
 @onready var plains: Line = $PlainsLine
+@onready var brights_label: Label = %BrightsLabel
+@onready var ribbons_label: Label = %RibbonsLabel
+@onready var animals_label: Label = %AnimalsLabel
+@onready var plains_label: Label = %PlainsLabel
 
 func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) -> Tween:
 	card_visual.remove_highlight()
@@ -36,3 +40,20 @@ func capture_card(card_visual: CardVisual) -> Tween:
 			return _animate_card_capture(card_visual, plains)
 
 	return null
+
+
+func set_capture_labels(cards: Array[Card]) -> void:
+	var type_counts = {
+		Card.CardType.BRIGHT: 0,
+		Card.CardType.RIBBON: 0,
+		Card.CardType.ANIMAL: 0,
+		Card.CardType.PLAIN: 0
+	}
+	
+	for card in cards:
+		type_counts[card.type] += 1
+	
+	brights_label.text = str(type_counts[Card.CardType.BRIGHT]) if type_counts[Card.CardType.BRIGHT] > 0 else ""
+	ribbons_label.text = str(type_counts[Card.CardType.RIBBON]) if type_counts[Card.CardType.RIBBON] > 0 else ""
+	animals_label.text = str(type_counts[Card.CardType.ANIMAL]) if type_counts[Card.CardType.ANIMAL] > 0 else ""
+	plains_label.text = str(type_counts[Card.CardType.PLAIN]) if type_counts[Card.CardType.PLAIN] > 0 else ""

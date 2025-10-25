@@ -42,6 +42,7 @@ func _connect_signals() -> void:
 	game_state.deck_initialized.connect(_on_deck_initialized)
 	game_state.card_moved.connect(_on_card_moved)
 	game_state.player_selected_card.connect(_on_player_selected_card)
+	game_state.capture_numbers_updated.connect(ui_manager.update_capture_numbers)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)

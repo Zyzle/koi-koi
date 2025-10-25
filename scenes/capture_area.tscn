@@ -30,3 +30,67 @@ script = ExtResource("3_hnxaw")
 position = Vector2(-300, 165)
 gizmo_extents = 45.0
 script = ExtResource("3_hnxaw")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_left = -320.0
+offset_top = -145.0
+offset_right = -233.0
+offset_bottom = -105.0
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "Brights:"
+vertical_alignment = 1
+
+[node name="BrightsLabel" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+offset_left = -320.0
+offset_top = -35.0
+offset_right = -233.0
+offset_bottom = 5.0
+
+[node name="Label" type="Label" parent="HBoxContainer2"]
+layout_mode = 2
+text = "Ribbons:"
+vertical_alignment = 1
+
+[node name="RibbonsLabel" type="Label" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="."]
+offset_left = -320.0
+offset_top = 75.0
+offset_right = -233.0
+offset_bottom = 115.0
+
+[node name="Label" type="Label" parent="HBoxContainer3"]
+layout_mode = 2
+text = "Animals:"
+vertical_alignment = 1
+
+[node name="AnimalsLabel" type="Label" parent="HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="."]
+offset_left = -320.0
+offset_top = 185.0
+offset_right = -255.0
+offset_bottom = 225.0
+
+[node name="Label" type="Label" parent="HBoxContainer4"]
+layout_mode = 2
+text = "Plains:"
+vertical_alignment = 1
+
+[node name="PlainsLabel" type="Label" parent="HBoxContainer4"]
+unique_name_in_owner = true
+layout_mode = 2
+vertical_alignment = 1

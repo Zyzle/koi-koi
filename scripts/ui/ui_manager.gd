@@ -228,3 +228,11 @@ func end_turn_cleanup() -> void:
 	# Remove all field card highlights
 	for card_visual in field_container.get_cards():
 		card_visual.remove_highlight()
+
+
+func update_capture_numbers(for_turn: GameState.Turn, captured_cards: Array[Card]) -> void:
+	match for_turn:
+		GameState.Turn.PLAYER:
+			player_capture_area.set_capture_labels(captured_cards)
+		GameState.Turn.OPPONENT:
+			opponent_capture_area.set_capture_labels(captured_cards)
