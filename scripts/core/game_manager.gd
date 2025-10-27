@@ -28,6 +28,8 @@ func _connect_signals() -> void:
 	game_state.turn_changed.connect(_on_turn_changed)
 	game_state.turn_phase_changed.connect(_on_turn_phase_changed)
 	ui_manager.deal_finished.connect(_on_deal_finished)
+	ui_manager.player_chose_koi_koi.connect(_on_player_chose_koi_koi)
+	ui_manager.player_chose_end_round.connect(_on_player_chose_end_round)
 	
 	# Card movement signals for game logic
 	# game_state.card_moved_to_field.connect(_on_card_moved_to_field)
@@ -43,6 +45,7 @@ func _connect_signals() -> void:
 	game_state.card_moved.connect(_on_card_moved)
 	game_state.player_selected_card.connect(_on_player_selected_card)
 	game_state.capture_numbers_updated.connect(ui_manager.update_capture_numbers)
+	game_state.show_player_koi_koi.connect(ui_manager.prompt_player_koi_koi)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
@@ -117,11 +120,14 @@ func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
 			var turn_scores
 			if game_state.current_turn == GameState.Turn.PLAYER:
 				turn_scores = Scoring.calculate_score(game_state.player_captured)
+				var can_koi_koi = game_state.can_player_koi_koi(turn_scores)
+				if not can_koi_koi:
+					game_state.advance_turn_phase()
 			else:
 				turn_scores = Scoring.calculate_score(game_state.opponent_captured)
+				game_state.advance_turn_phase()
 
 			print("Turn scores: ", turn_scores)
-			game_state.advance_turn_phase()
 			
 		GameState.TurnPhase.TURN_END:
 			print("Turn ending")
@@ -165,6 +171,15 @@ func _on_card_moved(card: Card, from_to_location: String, move_also: Card) -> vo
 
 func _on_player_selected_card(card: Card) -> void:
 	ui_manager.player_selected_card(card)
+
+
+func _on_player_chose_koi_koi() -> void:
+	# advance turn phase to keep playing
+	game_state.advance_turn_phase()
+
+
+func _on_player_chose_end_round() -> void:
+	game_state.end_round()
 
 
 # Controller methods - handle user input and decide what to do

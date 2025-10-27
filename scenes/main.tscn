@@ -44,6 +44,7 @@ script = ExtResource("1_o5qli")
 script = ExtResource("2_0wfyh")
 
 [node name="GameWorld" type="Node2D" parent="."]
+unique_name_in_owner = true
 
 [node name="DeckSlot" parent="GameWorld" instance=ExtResource("4_tbgi4")]
 unique_name_in_owner = true
@@ -68,8 +69,8 @@ position = Vector2(600, 540)
 
 [node name="PlayerCaptureArea" parent="GameWorld" instance=ExtResource("7_o6xl0")]
 unique_name_in_owner = true
-position = Vector2(1550, 785)
+position = Vector2(1540, 780)
 
 [node name="OpponentCaptureArea" parent="GameWorld" instance=ExtResource("7_o6xl0")]
 unique_name_in_owner = true
-position = Vector2(1550, 295)
+position = Vector2(1540, 300)

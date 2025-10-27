@@ -1,13 +1,36 @@
-[gd_scene load_steps=4 format=3 uid="uid://bcy54dv2wr8xn"]
+[gd_scene load_steps=6 format=3 uid="uid://bcy54dv2wr8xn"]
 
 [ext_resource type="Script" uid="uid://csdiqsni5h532" path="res://scripts/ui/capture_area.gd" id="1_813a5"]
 [ext_resource type="Texture2D" uid="uid://c27ju22ya1jjg" path="res://assets/capture-background.png" id="1_khg73"]
+[ext_resource type="Texture2D" uid="uid://cwkd0mt6djowh" path="res://assets/panel_tan.png" id="2_2ddnc"]
 [ext_resource type="Script" uid="uid://knur3vocymce" path="res://scripts/ui/line.gd" id="3_hnxaw"]
+[ext_resource type="Theme" uid="uid://dxx5m48t8ucyq" path="res://koi_koi_theme.tres" id="6_rrv1x"]
 
 [node name="CaptureArea" type="Node2D"]
 script = ExtResource("1_813a5")
 
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+modulate = Color(1, 1, 1, 0.627451)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -370.0
+offset_top = -235.0
+offset_right = 370.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_2ddnc")
+region_rect = Rect2(0, 0, 271, 265)
+patch_margin_left = 55
+patch_margin_top = 55
+patch_margin_right = 55
+patch_margin_bottom = 55
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(1, 1, 1, 0.39215687)
 texture = ExtResource("1_khg73")
 
@@ -39,12 +62,14 @@ offset_bottom = -105.0
 
 [node name="Label" type="Label" parent="HBoxContainer"]
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 text = "Brights:"
 vertical_alignment = 1
 
 [node name="BrightsLabel" type="Label" parent="HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 vertical_alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="."]
@@ -55,12 +80,14 @@ offset_bottom = 5.0
 
 [node name="Label" type="Label" parent="HBoxContainer2"]
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 text = "Ribbons:"
 vertical_alignment = 1
 
 [node name="RibbonsLabel" type="Label" parent="HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 vertical_alignment = 1
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="."]
@@ -71,12 +98,14 @@ offset_bottom = 115.0
 
 [node name="Label" type="Label" parent="HBoxContainer3"]
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 text = "Animals:"
 vertical_alignment = 1
 
 [node name="AnimalsLabel" type="Label" parent="HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 vertical_alignment = 1
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="."]
@@ -87,10 +116,12 @@ offset_bottom = 225.0
 
 [node name="Label" type="Label" parent="HBoxContainer4"]
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 text = "Plains:"
 vertical_alignment = 1
 
 [node name="PlainsLabel" type="Label" parent="HBoxContainer4"]
 unique_name_in_owner = true
 layout_mode = 2
+theme = ExtResource("6_rrv1x")
 vertical_alignment = 1

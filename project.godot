@@ -28,3 +28,7 @@ project/assembly_name="Koi-koi"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[gui]
+
+theme/custom_font="uid://dxx5m48t8ucyq"

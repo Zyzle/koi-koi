@@ -2,8 +2,10 @@ class_name UIManager
 extends Node
 
 const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
+const SCORING_PANEL_SCENE_PATH = "res://scenes/scoring_panel.tscn"
 
 
+@onready var game_world: Node2D = %GameWorld
 @onready var player_hand_container: Hand = %PlayerHand
 @onready var field_container: Field = %Field
 @onready var opponent_hand_container: Hand = %OpponentHand
@@ -12,12 +14,15 @@ const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 @onready var opponent_capture_area: CaptureArea = %OpponentCaptureArea
 
 signal deal_finished();
+signal player_chose_koi_koi()
+signal player_chose_end_round()
 
 var game_manager: GameManager
 var game_state: GameState
 var card_registry: Dictionary[Card, CardVisual]
 var deal_registry: Array[Dictionary]
 var selected_card: CardVisual
+var scoring_panel: ScoringPanel
 
 func _create_card_visual(card: Card) -> CardVisual:
 	var card_scene = preload(CARD_SCENE_PATH)
@@ -45,6 +50,18 @@ func _highlight_matching_field_cards(card: Card) -> void:
 			card_visual.apply_highlight()
 		else:
 			card_visual.remove_highlight()
+
+
+func _on_koi_koi_pressed() -> void:
+	print("UI: Player chose Koi-Koi")
+	scoring_panel.queue_free()
+	player_chose_koi_koi.emit()
+
+
+func _on_end_pressed() -> void:
+	print("UI: Player chose to end round")
+	scoring_panel.queue_free()
+	player_chose_end_round.emit()
 
 
 func set_game_state(state: GameState) -> void:
@@ -236,3 +253,14 @@ func update_capture_numbers(for_turn: GameState.Turn, captured_cards: Array[Card
 			player_capture_area.set_capture_labels(captured_cards)
 		GameState.Turn.OPPONENT:
 			opponent_capture_area.set_capture_labels(captured_cards)
+
+
+func prompt_player_koi_koi() -> void:
+	print("UI: Prompting player for Koi-Koi decision")
+	var scoring_panel_scene = preload(SCORING_PANEL_SCENE_PATH)
+	scoring_panel = scoring_panel_scene.instantiate()
+	scoring_panel.position = Vector2(625, 140)
+	scoring_panel.connect("koi_koi_pressed", _on_koi_koi_pressed)
+	scoring_panel.connect("end_pressed", _on_end_pressed)
+	scoring_panel.set_game_state(game_state)
+	game_world.add_child(scoring_panel)

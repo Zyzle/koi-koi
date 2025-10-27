@@ -16,11 +16,34 @@ enum YAKU_TYPE {
 	KASU
 }
 
-static func calculate_score(captured_cards: Array[Card]) -> Dictionary:
-	var score_details = {
-		"total_score": 0,
-		"yaku_achieved": []
-	}
+const YAKU_NAMES_MAP: Dictionary[YAKU_TYPE, Array] = {
+	YAKU_TYPE.FIVE_BRIGHT: ["Five Brights", "(五光)"],
+	YAKU_TYPE.RED_POETRY_BLUE_TANZAKU: ["Red Poetry & Blue Tanzaku", "(赤短・青短の重複)"],
+	YAKU_TYPE.DRY_FOUR_BRIGHT: ["Dry Four Brights", "(四光)"],
+	YAKU_TYPE.RAINY_FOUR_BRIGHT: ["Rainy Four Brights", "(雨四光)"],
+	YAKU_TYPE.DRY_THREE_BRIGHT: ["Dry Three Brights", "(三光)"],
+	YAKU_TYPE.MOON_VIEWING: ["Moon Viewing", "(月見酒)"],
+	YAKU_TYPE.FLOWER_VIEWING: ["Flower Viewing", "(花見酒)"],
+	YAKU_TYPE.BOAR_DEER_BUTTERFLY: ["Boar, Deer, Butterfly", "(猪鹿蝶)"],
+	YAKU_TYPE.RED_POETRY_TANZAKU: ["Red Poetry Tanzaku", "(赤短)"],
+	YAKU_TYPE.BLUE_TANZAKU: ["Blue Tanzaku", "(青短)"],
+	YAKU_TYPE.TANE: ["Tane", "(タネ)"],
+	YAKU_TYPE.TANZAKU: ["Tanzaku", "(短冊)"],
+	YAKU_TYPE.KASU: ["Kasu", "(カス)"]
+}
+
+class ScoreResult:
+	var total_score: int
+	var yaku_achieved: Array[YAKU_TYPE]
+	var yaku_cards: Dictionary[YAKU_TYPE, Array]
+
+
+	func _to_string() -> String:
+		return "ScoreResult(total_score=%d, yaku_achieved=%s)" % [total_score, yaku_achieved]
+
+
+static func calculate_score(captured_cards: Array[Card]) -> ScoreResult:
+	var score_details = ScoreResult.new()
 	
 	var type_counts = {
 		Card.CardType.BRIGHT: 0,
@@ -83,16 +106,25 @@ static func calculate_score(captured_cards: Array[Card]) -> Dictionary:
 			score_details.total_score += max(type_counts[Card.CardType.PLAIN] - 10, 0)
 
 		score_details.yaku_achieved.append(YAKU_TYPE.KASU)
+		score_details.yaku_cards[YAKU_TYPE.KASU] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.PLAIN or (has_sake_cup and card.month == 9 and card.number == 4)
+		)
 
 	# Tanzaku
 	if type_counts[Card.CardType.RIBBON] >= 5:
 		score_details.total_score += type_counts[Card.CardType.RIBBON] - 4
 		score_details.yaku_achieved.append(YAKU_TYPE.TANZAKU)
+		score_details.yaku_cards[YAKU_TYPE.TANZAKU] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.RIBBON
+		)
 
 	# Tane
 	if type_counts[Card.CardType.ANIMAL] >= 5:
 		score_details.total_score += type_counts[Card.CardType.ANIMAL] - 4
 		score_details.yaku_achieved.append(YAKU_TYPE.TANE)
+		score_details.yaku_cards[YAKU_TYPE.TANE] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.ANIMAL
+		)
 
 	# Aotan
 	if ribbon_cards.size() >= 3:
@@ -103,6 +135,9 @@ static func calculate_score(captured_cards: Array[Card]) -> Dictionary:
 		if num_blue == 3:
 			score_details.total_score += 5
 			score_details.yaku_achieved.append(YAKU_TYPE.BLUE_TANZAKU)
+			score_details.yaku_cards[YAKU_TYPE.BLUE_TANZAKU] = captured_cards.filter(func(card: Card):
+				return card.month in [6, 9, 10] and card.type == Card.CardType.RIBBON
+			)
 
 	# Akatan
 	if ribbon_cards.size() >= 3:
@@ -113,26 +148,41 @@ static func calculate_score(captured_cards: Array[Card]) -> Dictionary:
 		if num_red == 3:
 			score_details.total_score += 5
 			score_details.yaku_achieved.append(YAKU_TYPE.RED_POETRY_TANZAKU)
+			score_details.yaku_cards[YAKU_TYPE.RED_POETRY_TANZAKU] = captured_cards.filter(func(card: Card):
+				return card.month in [1, 2, 3] and card.type == Card.CardType.RIBBON
+			)
 
 	# Boar, Deer, Butterfly
 	if has_boar and has_deer and has_butterfly:
 		score_details.total_score += 5
 		score_details.yaku_achieved.append(YAKU_TYPE.BOAR_DEER_BUTTERFLY)
+		score_details.yaku_cards[YAKU_TYPE.BOAR_DEER_BUTTERFLY] = captured_cards.filter(func(card: Card):
+			return (card.month == 7 and card.number == 4) or (card.month == 10 and card.number == 4) or (card.month == 6 and card.number == 4)
+		)
 
 	# Flower Viewing
 	if has_cherry_blossom and has_sake_cup:
 		score_details.total_score += 5
 		score_details.yaku_achieved.append(YAKU_TYPE.FLOWER_VIEWING)
+		score_details.yaku_cards[YAKU_TYPE.FLOWER_VIEWING] = captured_cards.filter(func(card: Card):
+			return (card.month == 3 and card.number == 4) or (card.month == 9 and card.number == 4)
+		)
 
 	# Moon Viewing
 	if has_moon and has_sake_cup:
 		score_details.total_score += 5
 		score_details.yaku_achieved.append(YAKU_TYPE.MOON_VIEWING)
+		score_details.yaku_cards[YAKU_TYPE.MOON_VIEWING] = captured_cards.filter(func(card: Card):
+			return (card.month == 8 and card.number == 4) or (card.month == 9 and card.number == 4)
+		)
 
 	# dry 3 bright
 	if bright_cards.size() == 3 and not has_rain_man:
 		score_details.total_score += 5
 		score_details.yaku_achieved.append(YAKU_TYPE.DRY_THREE_BRIGHT)
+		score_details.yaku_cards[YAKU_TYPE.DRY_THREE_BRIGHT] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.BRIGHT
+		)
 
 	# dry/rainy 4 bright
 	if bright_cards.size() == 4:
@@ -142,10 +192,16 @@ static func calculate_score(captured_cards: Array[Card]) -> Dictionary:
 		else:
 			score_details.total_score += 8
 			score_details.yaku_achieved.append(YAKU_TYPE.DRY_FOUR_BRIGHT)
+		score_details.yaku_cards[score_details.yaku_achieved[-1]] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.BRIGHT
+		)
 
 	# 5 bright
 	if bright_cards.size() == 5:
 		score_details.total_score += 10
 		score_details.yaku_achieved.append(YAKU_TYPE.FIVE_BRIGHT)
-	
+		score_details.yaku_cards[YAKU_TYPE.FIVE_BRIGHT] = captured_cards.filter(func(card: Card):
+			return card.type == Card.CardType.BRIGHT
+		)
+
 	return score_details

@@ -107,3 +107,8 @@ func set_selected(s: bool) -> void:
 		remove_highlight()
 		var shrink = unembiggen()
 		await shrink.finished
+
+
+func set_face_up() -> void:
+	$CardBackImage.visible = false
+	$CardImage.visible = true

@@ -68,19 +68,37 @@ var field_cards: Array[Card]
 var deck: Array[Card]
 var player_captured: Array[Card]
 var opponent_captured: Array[Card]
-var player_score: int
-var opponent_score: int
+var player_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
+var opponent_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
 
 # Game Flow Signals
 signal phase_changed(new_phase: Phase)
 signal turn_changed(new_turn: Turn)
 signal turn_phase_changed(new_turn_phase: TurnPhase)
 signal player_selected_card(card: Card)
+signal show_player_koi_koi()
 
 # Model Events (generic)
 signal card_moved(card: Card, from_to_location: String, move_also: Card)
 signal deck_initialized(deck: Array[Card])
 signal capture_numbers_updated(for_turn: Turn, cards: Array[Card])
+
+
+func _arrays_have_same_content(arr1: Array, arr2: Array) -> bool:
+	if arr1.size() != arr2.size():
+		print("array sizes differ:", arr1.size(), arr2.size())
+		return false
+	
+	var temp_arr2 = arr2.duplicate()
+	for item in arr1:
+		if temp_arr2.has(item):
+			temp_arr2.erase(item)
+		else:
+			print("array contents differ:", item)
+			return false
+	
+	print("arrays have same content")
+	return true
 
 
 ## Add a set of `Card` instances to the deck and shuffle
@@ -233,3 +251,19 @@ func advance_turn_phase() -> void:
 			else:
 				current_turn = Turn.PLAYER
 				start_turn()
+
+
+func can_player_koi_koi(result: Scoring.ScoreResult) -> bool:
+	var old_score = player_score
+	player_score = result
+	var can_koi_koi = false
+	if result.total_score != old_score.total_score or not _arrays_have_same_content(result.yaku_achieved, old_score.yaku_achieved):
+		show_player_koi_koi.emit()
+		can_koi_koi = true
+
+	player_score = result
+	return can_koi_koi
+
+
+func end_round() -> void:
+	current_phase = Phase.ROUND_END
