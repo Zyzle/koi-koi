@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c27ju22ya1jjg"
-path="res://.godot/imported/capture-background.png-569bca40385e5df071328e80ab5e5859.ctex"
+uid="uid://gkbyul4vf5c7"
+path="res://.godot/imported/panel_tan_small.png-5f527e4007fe3445eed6a19f2ef2a435.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/capture-background.png"
-dest_files=["res://.godot/imported/capture-background.png-569bca40385e5df071328e80ab5e5859.ctex"]
+source_file="res://assets/panel_tan_small.png"
+dest_files=["res://.godot/imported/panel_tan_small.png-5f527e4007fe3445eed6a19f2ef2a435.ctex"]
 
 [params]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bh8a7coqatsbw"]
+[gd_scene load_steps=12 format=3 uid="uid://bh8a7coqatsbw"]
 
 [ext_resource type="Texture2D" uid="uid://hqw1gklef1u7" path="res://assets/panel_pale.png" id="1_n2rff"]
 [ext_resource type="Texture2D" uid="uid://c57qhxwfi52lv" path="res://assets/callout_blue.png" id="2_uid7n"]
@@ -6,6 +6,8 @@
 [ext_resource type="Theme" uid="uid://dxx5m48t8ucyq" path="res://koi_koi_theme.tres" id="3_nvy13"]
 [ext_resource type="Texture2D" uid="uid://lri4v48rg5ud" path="res://assets/button_tan.png" id="4_sjh5u"]
 [ext_resource type="Texture2D" uid="uid://c5tvrxlapv37w" path="res://assets/button_red.png" id="5_g7vyd"]
+[ext_resource type="Texture2D" uid="uid://d0biplgag7uqi" path="res://assets/button_tan_pressed.png" id="6_xe84r"]
+[ext_resource type="Texture2D" uid="uid://cv1ftv68rc66v" path="res://assets/button_red_pressed.png" id="8_0wngi"]
 
 [sub_resource type="Theme" id="Theme_s04ys"]
 
@@ -92,6 +94,7 @@ theme_override_constants/separation = 80
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 texture_normal = ExtResource("4_sjh5u")
+texture_pressed = ExtResource("6_xe84r")
 ignore_texture_size = true
 stretch_mode = 4
 
@@ -115,6 +118,7 @@ text = "Koi Koi"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 texture_normal = ExtResource("5_g7vyd")
+texture_pressed = ExtResource("8_0wngi")
 ignore_texture_size = true
 stretch_mode = 4
 
