@@ -1,7 +1,8 @@
 class_name CardVisual
 extends Node2D
 
-const TEXTURE_PATH = "res://assets/%d-%d.png"
+const TEXTURE_DIFFUSE_PATH = "res://assets/%d-%d.png"
+const TEXTURE_NORMAL_PATH = "res://assets/cardback_n_0.png"
 const HIGHLIGHT_SHADER_PATH = "res://shaders/card_highlight_shader.gdshader"
 const DEFAULT_SCALE = Vector2(0.5, 0.5)
 
@@ -53,8 +54,11 @@ func disconnect_events():
 
 
 func update_visual() -> void:
-	var texture_path = TEXTURE_PATH % [_card_data.month, _card_data.number]
-	$CardImage.texture = load(texture_path)
+	var canvas_texture = CanvasTexture.new()
+	var texture_diffuse_path = TEXTURE_DIFFUSE_PATH % [_card_data.month, _card_data.number]
+	canvas_texture.diffuse_texture = load(texture_diffuse_path)
+	canvas_texture.normal_texture = load(TEXTURE_NORMAL_PATH)
+	$CardImage.texture = canvas_texture
 
 
 func set_game_state(state: GameState) -> void:
