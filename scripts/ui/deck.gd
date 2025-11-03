@@ -16,3 +16,7 @@ func get_top_card() -> CardVisual:
 	if cards.size() > 0:
 		return cards[cards.size() - 1]
 	return null
+
+
+func clear_all_cards() -> void:
+	cards.clear()

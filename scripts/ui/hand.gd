@@ -37,3 +37,9 @@ func remove_card(card_visual: CardVisual) -> void:
 	if hand.has(card_visual):
 		hand.erase(card_visual)
 		_tighten_hand_layout()
+
+
+func clear_all_cards() -> void:
+	hand.clear()
+	for child in get_children():
+		child.queue_free()

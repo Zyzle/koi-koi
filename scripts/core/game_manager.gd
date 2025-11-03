@@ -16,10 +16,12 @@ func _ready() -> void:
 
 
 func _initialize_game() -> void:
+	print("GameManager: Initializing game")
 	# Pass GameState to UIManager
 	ui_manager.set_game_state(game_state)
 	_connect_signals()
-	_setup_new_game()
+	# _setup_new_game()
+	game_state.advance_game_phase()
 
 
 func _connect_signals() -> void:
@@ -46,6 +48,9 @@ func _connect_signals() -> void:
 	game_state.player_selected_card.connect(_on_player_selected_card)
 	game_state.capture_numbers_updated.connect(ui_manager.update_capture_numbers)
 	game_state.show_player_koi_koi.connect(ui_manager.prompt_player_koi_koi)
+	game_state.reset_game.connect(ui_manager.reset_ui_for_new_game)
+	game_state.reset_game.connect(_setup_new_game)
+	game_state.update_wins.connect(ui_manager.update_round_wins)
 	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
 	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
 	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
@@ -62,14 +67,18 @@ func _setup_new_game() -> void:
 		cards.append(card_instance)
 	game_state.add_cards_to_deck(cards)
 	
-	# Start the game flow
-	game_state.current_phase = GameState.Phase.DEAL
-	
 
 # Game flow signal handlers
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
 	print("Phase changed to: ", new_phase)
 	match new_phase:
+		GameState.Phase.START:
+			print("Starting new round...")
+			# Setup for new round
+			_setup_new_game()
+			# Advance to DEAL phase
+			game_state.advance_game_phase()
+
 		GameState.Phase.DEAL:
 			print("Dealing cards...")
 			for i in range(8):
@@ -77,9 +86,15 @@ func _on_phase_changed(new_phase: GameState.Phase) -> void:
 				game_state.deal_card_to_opponent()
 				game_state.deal_card_to_field()
 			ui_manager.process_deal_queue()
+			# Note: advance_game_phase is called by _on_deal_finished signal
+
 		GameState.Phase.PLAY:
 			print("Starting play phase")
 			game_state.current_turn = GameState.Turn.PLAYER
+		
+		GameState.Phase.ROUND_END:
+			print("Round ended. Calculating final scores...")
+			game_state.advance_game_phase()
 
 
 func _on_turn_changed(new_turn: GameState.Turn) -> void:
@@ -136,7 +151,7 @@ func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
 
 
 func _on_deal_finished() -> void:
-	game_state.current_phase = GameState.Phase.PLAY
+	game_state.advance_game_phase()
 
 
 # Model event handlers - Controller translates to specific UI actions
@@ -179,7 +194,8 @@ func _on_player_chose_koi_koi() -> void:
 
 
 func _on_player_chose_end_round() -> void:
-	game_state.end_round()
+	print("GameManager: Player chose to end round")
+	game_state.end_round(1)
 
 
 # Controller methods - handle user input and decide what to do
@@ -189,7 +205,7 @@ func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
 	# Only allow card selection during appropriate turn phases
 	if not (game_state.current_turn_phase == GameState.TurnPhase.HAND_FIELD_CAPTURE or
 			game_state.current_turn_phase == GameState.TurnPhase.PLAY_CARD_TO_FIELD):
-		print("Wrong phase for selecting card")
+		print("Wrong phase for selecting card: ", game_state.current_turn_phase)
 		return
 	
 	# Game logic decides what happens

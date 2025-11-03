@@ -6,7 +6,6 @@ enum Phase {
 	START,
 	DEAL,
 	PLAY,
-	DRAW,
 	ROUND_END
 }
 
@@ -61,7 +60,7 @@ var players_chosen_card: Card:
 		player_selected_card.emit(value)
 
 # Regular properties
-var round_number: int
+var round_number: int = 0
 var player_hand: Array[Card]
 var opponent_hand: Array[Card]
 var field_cards: Array[Card]
@@ -70,6 +69,8 @@ var player_captured: Array[Card]
 var opponent_captured: Array[Card]
 var player_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
 var opponent_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
+## Tracks wins for each round, 0 for no win, 1 for player win, 2 for opponent win
+var round_wins: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # Game Flow Signals
 signal phase_changed(new_phase: Phase)
@@ -77,6 +78,8 @@ signal turn_changed(new_turn: Turn)
 signal turn_phase_changed(new_turn_phase: TurnPhase)
 signal player_selected_card(card: Card)
 signal show_player_koi_koi()
+signal reset_game()
+signal update_wins(wins: Array[int])
 
 # Model Events (generic)
 signal card_moved(card: Card, from_to_location: String, move_also: Card)
@@ -99,6 +102,20 @@ func _arrays_have_same_content(arr1: Array, arr2: Array) -> bool:
 	
 	print("arrays have same content")
 	return true
+
+
+func _reset_game_for_new_round() -> void:
+	# Clear hands, field, captured cards, scores
+	player_hand.clear()
+	opponent_hand.clear()
+	field_cards.clear()
+	player_captured.clear()
+	opponent_captured.clear()
+	player_score = Scoring.ScoreResult.new()
+	opponent_score = Scoring.ScoreResult.new()
+	round_number += 1
+	print("Starting round ", round_number)
+	reset_game.emit()
 
 
 ## Add a set of `Card` instances to the deck and shuffle
@@ -215,6 +232,33 @@ func can_card_capture_from_field(card: Card) -> bool:
 	return false
 
 
+func advance_game_phase() -> void:
+	match current_phase:
+		Phase.NONE:
+			print("Advancing from NONE to START phase")
+			current_phase = Phase.START
+			# advance_game_phase()
+
+		Phase.START:
+			print("Advancing from START to DEAL phase")
+			_reset_game_for_new_round()
+			current_phase = Phase.DEAL
+
+		Phase.DEAL:
+			print("Advancing from DEAL to PLAY phase")
+			current_turn_phase = TurnPhase.HAND_FIELD_CAPTURE
+			current_phase = Phase.PLAY
+
+		Phase.PLAY:
+			print("Advancing from PLAY to ROUND_END phase")
+			# Check for end of round conditions here later
+			current_phase = Phase.ROUND_END
+
+		Phase.ROUND_END:
+			print("Advancing from ROUND_END to START phase")
+			current_phase = Phase.START
+
+
 ## Advance to the next phase of the turn
 func advance_turn_phase() -> void:
 	match current_turn_phase:
@@ -265,5 +309,8 @@ func can_player_koi_koi(result: Scoring.ScoreResult) -> bool:
 	return can_koi_koi
 
 
-func end_round() -> void:
-	current_phase = Phase.ROUND_END
+## End the current round, setting winner as 1 for player, 2 for opponent
+func end_round(winner: int) -> void:
+	round_wins[round_number - 1] = winner
+	update_wins.emit(round_wins)
+	advance_game_phase()

@@ -85,3 +85,16 @@ func highlight_available_slot() -> void:
 func clear_all_highlights() -> void:
 	for slot in field_slots:
 		slot.remove_highlight()
+
+
+func clear_all_cards() -> void:
+	field.clear()
+	var slot_count = 1
+	for slot in field_slots:
+		if slot.card_visual:
+			slot.card_visual.queue_free()
+		slot.card_visual = null
+		slot.remove_highlight()
+		if slot_count > 8:
+			slot.visible = false
+		slot_count += 1

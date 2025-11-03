@@ -3,6 +3,8 @@ extends Node2D
 
 const CARD_REDUCED_SCALE = 0.5
 const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
+const COIN = "res://assets/coin.png"
+const COIN_DISABLED = "res://assets/coin_disabled.png"
 
 @onready var brights: Line = $BrightsLine
 @onready var ribbons: Line = $RibbonsLine
@@ -12,6 +14,8 @@ const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
 @onready var ribbons_label: Label = %RibbonsLabel
 @onready var animals_label: Label = %AnimalsLabel
 @onready var plains_label: Label = %PlainsLabel
+@onready var coin_container: GridContainer = %CoinContainer
+
 
 func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) -> Tween:
 	card_visual.remove_highlight()
@@ -57,3 +61,19 @@ func set_capture_labels(cards: Array[Card]) -> void:
 	ribbons_label.text = str(type_counts[Card.CardType.RIBBON]) if type_counts[Card.CardType.RIBBON] > 0 else ""
 	animals_label.text = str(type_counts[Card.CardType.ANIMAL]) if type_counts[Card.CardType.ANIMAL] > 0 else ""
 	plains_label.text = str(type_counts[Card.CardType.PLAIN]) if type_counts[Card.CardType.PLAIN] > 0 else ""
+
+
+func set_coins(coins: Array[int]) -> void:
+	var coin_sprites = coin_container.get_children()
+
+	for i in range(coin_sprites.size()):
+		var coin_texture = load(COIN) if coins[i] == 1 else load(COIN_DISABLED)
+		var sprite = coin_sprites[i] as TextureRect
+		sprite.texture = coin_texture
+		
+
+func clear_all_cards() -> void:
+	brights.clear_all_cards()
+	ribbons.clear_all_cards()
+	animals.clear_all_cards()
+	plains.clear_all_cards()

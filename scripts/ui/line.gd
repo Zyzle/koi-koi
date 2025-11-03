@@ -8,3 +8,8 @@ func add_card(card: CardVisual) -> void:
 
 func card_count() -> int:
 	return line.size()
+
+func clear_all_cards() -> void:
+	line.clear()
+	for child in get_children():
+		child.queue_free()

@@ -264,3 +264,27 @@ func prompt_player_koi_koi() -> void:
 	scoring_panel.connect("end_pressed", _on_end_pressed)
 	scoring_panel.set_game_state(game_state)
 	game_world.add_child(scoring_panel)
+
+
+func reset_ui_for_new_game() -> void:
+	# Clear all containers
+	player_hand_container.clear_all_cards()
+	opponent_hand_container.clear_all_cards()
+	field_container.clear_all_cards()
+	player_capture_area.clear_all_cards()
+	opponent_capture_area.clear_all_cards()
+	deck_slot.clear_all_cards()
+	
+	# Clear card registry
+	card_registry.clear()
+	selected_card = null
+
+
+func update_round_wins(wins: Array[int]) -> void:
+	var wins_player: Array[int]
+	wins_player.assign(wins.map(func(w: int): return 1 if w == 1 else 0))
+	var wins_opponent: Array[int]
+	wins_opponent.assign(wins.map(func(w: int): return 1 if w == 2 else 0))
+	print("UI: Updating round wins display: ", wins_player, wins_opponent)
+	player_capture_area.set_coins(wins_player)
+	opponent_capture_area.set_coins(wins_opponent)
