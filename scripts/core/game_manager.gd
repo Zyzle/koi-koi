@@ -2,12 +2,14 @@ class_name GameManager
 extends Node
 
 var game_state: GameState
-# var ai_player: AIPlayer
+var ai_player: AIPlayer
 var ui_manager: UIManager
 # var nework_manager: NetworkManager
 
 func _ready() -> void:
 	game_state = GameState.new()
+	ai_player = AIPlayer.new()
+	ai_player.set_difficulty(AIPlayer.Difficulty.MEDIUM)
 	ui_manager = get_node("../UIManager")
 	ui_manager.game_manager = self
 	
@@ -33,14 +35,6 @@ func _connect_signals() -> void:
 	ui_manager.player_chose_koi_koi.connect(_on_player_chose_koi_koi)
 	ui_manager.player_chose_end_round.connect(_on_player_chose_end_round)
 	
-	# Card movement signals for game logic
-	# game_state.card_moved_to_field.connect(_on_card_moved_to_field)
-	# game_state.cards_captured.connect(_on_cards_captured)
-	# game_state.cards_dealt.connect(_on_cards_dealt)
-	
-	# Score signals
-	# game_state.score_updated.connect(_on_score_updated)
-	# game_state.points_awarded.connect(_on_points_awarded)
 	
 	# Model events - Controller translates to UI actions
 	game_state.deck_initialized.connect(_on_deck_initialized)
@@ -51,10 +45,6 @@ func _connect_signals() -> void:
 	game_state.reset_game.connect(ui_manager.reset_ui_for_new_game)
 	game_state.reset_game.connect(_setup_new_game)
 	game_state.update_wins.connect(ui_manager.update_round_wins)
-	# game_state.cards_dealt.connect(ui_manager.on_cards_dealt)
-	# game_state.card_moved_to_field.connect(ui_manager.animate_card_to_field)
-	# game_state.cards_captured.connect(ui_manager.animate_cards_captured)
-	# game_state.score_updated.connect(ui_manager.update_scores)
 
 
 ## Create a new array of all the cards in the cards db,
@@ -103,9 +93,9 @@ func _on_turn_changed(new_turn: GameState.Turn) -> void:
 		# Start the player's turn sequence
 		game_state.start_turn()
 	elif new_turn == GameState.Turn.OPPONENT:
-		# AI will make move here later
-		# switch back to players turn for now
-		game_state.current_turn = GameState.Turn.PLAYER
+		# AI makes its move after a thinking delay
+		await get_tree().create_timer(ai_player.thinking_time).timeout
+		_make_ai_move()
 
 
 func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
@@ -262,3 +252,45 @@ func play_card_to_field(card: Card) -> void:
 	# Clear selection and advance to deck flip
 	game_state.players_chosen_card = null
 	game_state.advance_turn_phase()
+
+
+## AI opponent makes a move using MCTS
+func _make_ai_move() -> void:
+	print("GameManager: AI thinking...")
+	var action = ai_player.make_move(game_state)
+	if action:
+		print("GameManager: AI chose action: ", action.get_description())
+		_execute_ai_action(action)
+	else:
+		print("GameManager: AI couldn't find a move, ending turn")
+		game_state.advance_turn_phase()
+
+
+## Execute the AI's chosen action
+func _execute_ai_action(action: MCTSAction) -> void:
+	match action.action_type:
+		MCTSAction.ActionType.HAND_CAPTURE:
+			# AI captures with hand card
+			game_state.opponent_captured_cards(action.hand_card, action.field_card)
+			game_state.advance_turn_phase()
+			
+		MCTSAction.ActionType.PLAY_TO_FIELD:
+			# AI plays card to field
+			game_state.opponent_card_to_field(action.hand_card)
+			game_state.advance_turn_phase()
+			
+		MCTSAction.ActionType.DECK_CAPTURE:
+			# AI captures with deck card
+			var deck_card = game_state.deck[game_state.deck.size() - 1]
+			game_state.opponent_captured_cards(deck_card, action.field_card)
+			game_state.advance_turn_phase()
+			
+		MCTSAction.ActionType.KOI_KOI_YES:
+			# AI continues playing
+			print("GameManager: AI chose koi-koi!")
+			game_state.advance_turn_phase()
+			
+		MCTSAction.ActionType.KOI_KOI_NO:
+			# AI ends round
+			print("GameManager: AI ends round")
+			game_state.end_round(2) # 2 = opponent wins

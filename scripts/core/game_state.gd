@@ -193,6 +193,37 @@ func player_card_to_field(card: Card) -> void:
 		card_moved.emit(card, "player_hand_field", null)
 
 
+## When opponent captures cards, card1 is the opponent's chosen card
+func opponent_captured_cards(card1: Card, card2: Card) -> void:
+	if field_cards.has(card2):
+		field_cards.erase(card2)
+	else:
+		deck.erase(card2)
+	
+	opponent_captured.append(card2)
+	
+	if opponent_hand.has(card1):
+		# card came from opponent's hand
+		opponent_hand.erase(card1)
+		opponent_captured.append(card1)
+		card_moved.emit(card1, "opponent_field_captured", card2)
+	else:
+		# card came from the deck
+		deck.erase(card1)
+		opponent_captured.append(card1)
+		card_moved.emit(card1, "deck_field_captured_opponent", card2)
+	
+	capture_numbers_updated.emit(Turn.OPPONENT, opponent_captured)
+
+
+func opponent_card_to_field(card: Card) -> void:
+	if opponent_hand.has(card):
+		opponent_hand.erase(card)
+		field_cards.append(card)
+		card.make_field_card()
+		card_moved.emit(card, "opponent_hand_field", null)
+
+
 func start_deck_move() -> void:
 	var card = deck[deck.size() - 1]
 	# check if card is playable in field, if not add it
