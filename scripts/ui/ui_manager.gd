@@ -188,7 +188,25 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 		await tween.finished
 
 
-func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
+func field_captured_by_opponent(opponent_card: Card, field_card: Card) -> void:
+	var opponent_card_visual = _get_card_visual(opponent_card)
+	var field_card_visual = _get_card_visual(field_card)
+
+	opponent_card_visual.flip_card()
+	opponent_hand_container.remove_card(opponent_card_visual)
+	field_container.remove_card(field_card_visual)
+	selected_card = null
+
+	if opponent_card_visual:
+		var tween = opponent_capture_area.capture_card(opponent_card_visual)
+		await tween.finished
+
+	if field_card_visual:
+		var tween = opponent_capture_area.capture_card(field_card_visual)
+		await tween.finished
+
+
+func field_captured_by_deck(deck_card: Card, field_card: Card, player: GameState.Turn) -> void:
 	var deck_card_visual = _get_card_visual(deck_card)
 	var field_card_visual = _get_card_visual(field_card)
 
@@ -197,12 +215,14 @@ func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
 	field_container.remove_card(field_card_visual)
 	selected_card = null
 
+	var capture_area = player_capture_area if player == GameState.Turn.PLAYER else opponent_capture_area
+
 	if deck_card_visual:
-		var tween = player_capture_area.capture_card(deck_card_visual)
+		var tween = capture_area.capture_card(deck_card_visual)
 		await tween.finished
 
 	if field_card_visual:
-		var tween = player_capture_area.capture_card(field_card_visual)
+		var tween = capture_area.capture_card(field_card_visual)
 		await tween.finished
 
 

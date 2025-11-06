@@ -22,22 +22,25 @@ func search() -> MCTSAction:
 	
 	# Run MCTS iterations until time/iteration budget exhausted
 	while iterations < max_iterations and (Time.get_ticks_msec() - start_time) < max_time_ms:
-		# 1. Selection - traverse tree using UCB1
+		# 1. Selection - traverse tree using UCB1 until we find a non-fully-expanded node
 		var node = _select(root)
 		
-		# 2. Expansion - add a child node
-		if not node.is_terminal() and node.is_fully_expanded():
-			node = node.select_child()
-		elif not node.is_terminal():
-			node = node.expand()
+		# 2. Expansion - if not terminal and not fully expanded, expand it
+		var simulation_node = node
+		if not node.is_terminal() and not node.is_fully_expanded():
+			var expanded_child = node.expand()
+			if expanded_child != null:
+				simulation_node = expanded_child
 		
-		# 3. Simulation - play out randomly from new node
-		var result = _simulate(node)
+		# 3. Simulation - play out randomly from the node (could be expanded child or selected node)
+		var result = _simulate(simulation_node)
 		
 		# 4. Backpropagation - update statistics
-		_backpropagate(node, result)
+		_backpropagate(simulation_node, result)
 		
 		iterations += 1
+
+	print("finished iterations")
 	
 	# Return action leading to most visited child
 	var best_child = root.get_most_visited_child()
@@ -54,12 +57,10 @@ func search() -> MCTSAction:
 	return null
 
 
-## Selection phase - traverse tree selecting best children
+## Selection phase - traverse tree selecting best children until we find a non-fully-expanded or terminal node
 func _select(node: MCTSNode) -> MCTSNode:
-	print("MCTS: Starting selection from root: ", node)
-	while not node.is_terminal():
-		if not node.is_fully_expanded():
-			return node
+	# Keep going down the tree as long as node has children to explore
+	while not node.is_terminal() and node.is_fully_expanded() and not node.children.is_empty():
 		node = node.select_child()
 	return node
 
@@ -70,19 +71,36 @@ func _simulate(node: MCTSNode) -> float:
 	var depth = 0
 	var max_depth = 50 # Prevent infinite loops
 	
+	
 	# Play randomly until terminal state
 	while not GameSimulator.is_terminal_state(sim_state) and depth < max_depth:
+		# Handle automatic deck flip before getting actions
+		if sim_state.current_turn_phase == GameState.TurnPhase.FLIP_DECK_CARD:
+			_handle_deck_flip(sim_state)
+			continue # Skip to next iteration after handling deck flip
+		
+		# Handle turn end phase - switch turns
+		if sim_state.current_turn_phase == GameState.TurnPhase.TURN_END:
+			if sim_state.current_turn == GameState.Turn.PLAYER:
+				sim_state.current_turn = GameState.Turn.OPPONENT
+			else:
+				sim_state.current_turn = GameState.Turn.PLAYER
+			
+			# Start new turn - check for captures
+			if GameSimulator.can_capture_from_field(sim_state):
+				sim_state.current_turn_phase = GameState.TurnPhase.HAND_FIELD_CAPTURE
+			else:
+				sim_state.current_turn_phase = GameState.TurnPhase.PLAY_CARD_TO_FIELD
+			continue
+		
 		var actions = GameSimulator.get_legal_actions(sim_state)
+		
 		if actions.is_empty():
 			break
 		
 		# Choose random action (could be improved with heuristics)
 		var action = actions[randi() % actions.size()]
 		GameSimulator.apply_action(sim_state, action)
-		
-		# Handle automatic deck flip
-		if sim_state.current_turn_phase == GameState.TurnPhase.FLIP_DECK_CARD:
-			_handle_deck_flip(sim_state)
 		
 		depth += 1
 	

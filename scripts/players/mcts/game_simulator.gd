@@ -15,7 +15,22 @@ class SimulatedState:
 	var current_turn_phase: GameState.TurnPhase
 	var player_score: int = 0
 	var opponent_score: int = 0
-	
+
+	func _to_string() -> String:
+		return "SimulatedState(player_hand=%d, opponent_hand=%d, field_cards=%d, deck=%d, player_captured=%d, opponent_captured=%d, current_turn=%s, current_turn_phase=%s, player_score=%d, opponent_score=%d)" % [
+			player_hand.size(),
+			opponent_hand.size(),
+			field_cards.size(),
+			deck.size(),
+			player_captured.size(),
+			opponent_captured.size(),
+			GameState.TURN_MAP[current_turn],
+			GameState.TURN_PHASE_MAP[current_turn_phase],
+			player_score,
+			opponent_score
+		]
+
+		
 	func duplicate_state() -> SimulatedState:
 		var new_state = SimulatedState.new()
 		new_state.player_hand = player_hand.duplicate()
@@ -46,6 +61,7 @@ static func create_from_game_state(game_state: GameState) -> SimulatedState:
 	sim_state.current_turn_phase = game_state.current_turn_phase
 	sim_state.player_score = game_state.player_score.total_score
 	sim_state.opponent_score = game_state.opponent_score.total_score
+	print("Created simulated state: ", sim_state)
 	return sim_state
 
 
@@ -181,3 +197,13 @@ static func _evaluate_hand_potential(hand: Array[Card], field: Array[Card]) -> f
 static func is_terminal_state(state: SimulatedState) -> bool:
 	# Game ends if hands are empty or someone chose to end
 	return state.player_hand.is_empty() and state.opponent_hand.is_empty()
+
+
+## Check if current player can capture from field with their hand
+static func can_capture_from_field(state: SimulatedState) -> bool:
+	var hand = state.opponent_hand if state.current_turn == GameState.Turn.OPPONENT else state.player_hand
+	for hand_card in hand:
+		for field_card in state.field_cards:
+			if hand_card.month == field_card.month:
+				return true
+	return false

@@ -9,10 +9,24 @@ enum Phase {
 	ROUND_END
 }
 
+const PHASE_MAP = {
+	Phase.NONE: "None",
+	Phase.START: "Start",
+	Phase.DEAL: "Deal",
+	Phase.PLAY: "Play",
+	Phase.ROUND_END: "Round End"
+}
+
 enum Turn {
 	NONE,
 	PLAYER,
 	OPPONENT
+}
+
+const TURN_MAP = {
+	Turn.NONE: "None",
+	Turn.PLAYER: "Player",
+	Turn.OPPONENT: "Opponent"
 }
 
 enum TurnPhase {
@@ -23,6 +37,16 @@ enum TurnPhase {
 	DECK_FIELD_CAPTURE, # 4
 	SCORE, # 5
 	TURN_END # 6
+}
+
+const TURN_PHASE_MAP = {
+	TurnPhase.NONE: "None",
+	TurnPhase.HAND_FIELD_CAPTURE: "Hand Field Capture",
+	TurnPhase.PLAY_CARD_TO_FIELD: "Play Card to Field",
+	TurnPhase.FLIP_DECK_CARD: "Flip Deck Card",
+	TurnPhase.DECK_FIELD_CAPTURE: "Deck Field Capture",
+	TurnPhase.SCORE: "Score",
+	TurnPhase.TURN_END: "Turn End"
 }
 
 # Private variables for properties with setters
@@ -211,7 +235,7 @@ func opponent_captured_cards(card1: Card, card2: Card) -> void:
 		# card came from the deck
 		deck.erase(card1)
 		opponent_captured.append(card1)
-		card_moved.emit(card1, "deck_field_captured_opponent", card2)
+		card_moved.emit(card1, "deck_field_captured", card2)
 	
 	capture_numbers_updated.emit(Turn.OPPONENT, opponent_captured)
 
@@ -245,10 +269,27 @@ func start_turn() -> void:
 	else:
 		current_turn_phase = TurnPhase.PLAY_CARD_TO_FIELD
 
+func start_opponent_turn() -> void:
+	if current_turn != Turn.OPPONENT:
+		return
+
+	if can_opponent_capture_from_field():
+		current_turn_phase = TurnPhase.HAND_FIELD_CAPTURE
+	else:
+		current_turn_phase = TurnPhase.PLAY_CARD_TO_FIELD
+
 
 ## Check if the current player has any cards that can capture from the field
 func can_player_capture_from_field() -> bool:
 	for hand_card in player_hand:
+		for field_card in field_cards:
+			if hand_card.month == field_card.month:
+				return true
+	return false
+
+
+func can_opponent_capture_from_field() -> bool:
+	for hand_card in opponent_hand:
 		for field_card in field_cards:
 			if hand_card.month == field_card.month:
 				return true
@@ -288,16 +329,20 @@ func advance_game_phase() -> void:
 		Phase.ROUND_END:
 			print("Advancing from ROUND_END to START phase")
 			current_phase = Phase.START
+			current_turn = Turn.NONE
+			current_turn_phase = TurnPhase.NONE
 
 
 ## Advance to the next phase of the turn
 func advance_turn_phase() -> void:
 	match current_turn_phase:
 		TurnPhase.HAND_FIELD_CAPTURE:
+			print("Advancing from HAND_FIELD_CAPTURE to PLAY_CARD_TO_FIELD")
 			# Player made a capture, now flip deck card
 			current_turn_phase = TurnPhase.FLIP_DECK_CARD
 			
 		TurnPhase.PLAY_CARD_TO_FIELD:
+			print("Advancing from PLAY_CARD_TO_FIELD to FLIP_DECK_CARD")
 			# Player played card to field, now flip deck card
 			current_turn_phase = TurnPhase.FLIP_DECK_CARD
 			
@@ -305,21 +350,26 @@ func advance_turn_phase() -> void:
 			# Check if deck card can capture
 			var deck_card = deck[deck.size() - 1]
 			if can_card_capture_from_field(deck_card):
+				print("Advancing from FLIP_DECK_CARD to DECK_FIELD_CAPTURE")
 				current_turn_phase = TurnPhase.DECK_FIELD_CAPTURE
 			else:
 				# Deck card goes to field, turn ends
+				print("Advancing from FLIP_DECK_CARD to SCORE")
 				deal_card_to_field()
 				current_turn_phase = TurnPhase.SCORE
 				
 		TurnPhase.DECK_FIELD_CAPTURE:
+			print("Advancing from DECK_FIELD_CAPTURE to SCORE")
 			# Deck capture completed, turn ends
 			current_turn_phase = TurnPhase.SCORE
 
 		TurnPhase.SCORE:
+			print("Advancing from SCORE to TURN_END")
 			# Scoring completed, turn ends
 			current_turn_phase = TurnPhase.TURN_END
 			
 		TurnPhase.TURN_END:
+			print("Advancing from TURN_END to new turn")
 			# Switch to opponent turn
 			if current_turn == Turn.PLAYER:
 				current_turn = Turn.OPPONENT
@@ -336,7 +386,16 @@ func can_player_koi_koi(result: Scoring.ScoreResult) -> bool:
 		show_player_koi_koi.emit()
 		can_koi_koi = true
 
-	player_score = result
+	return can_koi_koi
+
+
+func can_opponent_koi_koi(result: Scoring.ScoreResult) -> bool:
+	var old_score = opponent_score
+	opponent_score = result
+	var can_koi_koi = false
+	if result.total_score != old_score.total_score or not _arrays_have_same_content(result.yaku_achieved, old_score.yaku_achieved):
+		can_koi_koi = true
+
 	return can_koi_koi
 
 

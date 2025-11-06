@@ -44,6 +44,7 @@ func select_child() -> MCTSNode:
 ## Expand node by trying an untried action
 func expand() -> MCTSNode:
 	if untried_actions.is_empty():
+		print("MCTS: No untried actions to expand")
 		return null
 	
 	# Try a random untried action
