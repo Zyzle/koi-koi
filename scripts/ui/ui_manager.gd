@@ -3,6 +3,7 @@ extends Node
 
 const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 const SCORING_PANEL_SCENE_PATH = "res://scenes/scoring_panel.tscn"
+const WIN_LOSE_PANEL_SCENE_PATH = "res://scenes/win_lose_panel.tscn"
 
 
 @onready var game_world: Node2D = %GameWorld
@@ -23,6 +24,7 @@ var card_registry: Dictionary[Card, CardVisual]
 var deal_registry: Array[Dictionary]
 var selected_card: CardVisual
 var scoring_panel: ScoringPanel
+var wld_panel: WinLosePanel
 
 func _create_card_visual(card: Card) -> CardVisual:
 	var card_scene = preload(CARD_SCENE_PATH)
@@ -62,6 +64,12 @@ func _on_end_pressed() -> void:
 	print("UI: Player chose to end round")
 	scoring_panel.queue_free()
 	player_chose_end_round.emit()
+
+
+func _on_next_pressed() -> void:
+	print("UI: Next pressed on Win/Lose panel")
+	wld_panel.queue_free()
+	game_state.advance_game_phase()
 
 
 func set_game_state(state: GameState) -> void:
@@ -308,3 +316,9 @@ func update_round_wins(wins: Array[int]) -> void:
 	print("UI: Updating round wins display: ", wins_player, wins_opponent)
 	player_capture_area.set_coins(wins_player)
 	opponent_capture_area.set_coins(wins_opponent)
+	var wld_panel_scene = preload(WIN_LOSE_PANEL_SCENE_PATH)
+	wld_panel = wld_panel_scene.instantiate()
+	wld_panel.position = Vector2(625, 140)
+	wld_panel.set_game_state(game_state)
+	wld_panel.next_pressed.connect(_on_next_pressed)
+	game_world.add_child(wld_panel)

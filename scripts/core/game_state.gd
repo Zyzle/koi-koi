@@ -93,8 +93,11 @@ var player_captured: Array[Card]
 var opponent_captured: Array[Card]
 var player_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
 var opponent_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
+var rounds_to_play: int = 12
 ## Tracks wins for each round, 0 for no win, 1 for player win, 2 for opponent win
 var round_wins: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+var player_running_score: int = 0
+var opponent_running_score: int = 0
 
 # Game Flow Signals
 signal phase_changed(new_phase: Phase)
@@ -402,5 +405,11 @@ func can_opponent_koi_koi(result: Scoring.ScoreResult) -> bool:
 ## End the current round, setting winner as 1 for player, 2 for opponent
 func end_round(winner: int) -> void:
 	round_wins[round_number - 1] = winner
+
+	if winner == 1:
+		player_running_score += player_score.total_score
+	elif winner == 2:
+		opponent_running_score += opponent_score.total_score
+
 	update_wins.emit(round_wins)
-	advance_game_phase()
+	# advance_game_phase()

@@ -24,6 +24,10 @@ func _init(m: int, n: int, t: CardType, p: int) -> void:
 	points = p
 
 
+func _to_string():
+	return "Card(month=%d, number=%d, type=%s, points=%d)" % [month, number, str(type), points]
+
+
 func make_player_card() -> void:
 	is_field_card = false
 	is_player_card = true
@@ -34,5 +38,5 @@ func make_field_card() -> void:
 	is_field_card = true
 
 
-func _to_string():
-	return "Card(month=%d, number=%d, type=%s, points=%d)" % [month, number, str(type), points]
+func equals(other: Card) -> bool:
+	return month == other.month and number == other.number and type == other.type and points == other.points

@@ -17,6 +17,7 @@ const COIN_DISABLED = "res://assets/coin_disabled.png"
 @onready var coin_container: GridContainer = %CoinContainer
 
 
+# TODO: Temporarily slow down animations for debugging
 func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) -> Tween:
 	card_visual.remove_highlight()
 	var target_index = target_container.card_count()
@@ -27,8 +28,8 @@ func _animate_card_capture(card_visual: CardVisual, target_container: Node2D) ->
 	target_container.add_card(card_visual)
 
 	var tween = get_tree().create_tween()
-	tween.tween_property(card_visual, "position", target_local_position, 0.25)
-	tween.parallel().tween_property(card_visual, "scale", card_visual.scale * CARD_REDUCED_SCALE, 0.25)
+	tween.tween_property(card_visual, "position", target_local_position, 0.5)
+	tween.parallel().tween_property(card_visual, "scale", card_visual.scale * CARD_REDUCED_SCALE, 0.5)
 	return tween
 	
 

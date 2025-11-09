@@ -47,16 +47,57 @@ class SimulatedState:
 
 
 ## Create a simulated state from the real game state
-## TODO: player_hand and deck card contents should be hidden knowledge for opponent AI
-## should update these to be chosen at random from a new deck with known cards (field, captured, opponent hand) removed
 static func create_from_game_state(game_state: GameState) -> SimulatedState:
+	var guessed_cards: Array[Card] = []
+	for card in CardsDB.BASE_DECK:
+		guessed_cards.append(Card.new(card.month, card.number, card.type, card.points))
+
+	guessed_cards = guessed_cards.filter(func(c: Card) -> bool:
+		# Remove known cards from guessed pool
+		for known_card in game_state.field_cards:
+			if c.equals(known_card):
+				return false
+		for known_card in game_state.player_captured:
+			if c.equals(known_card):
+				return false
+		for known_card in game_state.opponent_captured:
+			if c.equals(known_card):
+				return false
+		for known_card in game_state.opponent_hand:
+			if c.equals(known_card):
+				return false
+		return true
+	)
+
+	guessed_cards.shuffle()
+
 	var sim_state = SimulatedState.new()
-	sim_state.player_hand = game_state.player_hand.duplicate()
 	sim_state.opponent_hand = game_state.opponent_hand.duplicate()
-	sim_state.field_cards = game_state.field_cards.duplicate()
-	sim_state.deck = game_state.deck.duplicate()
 	sim_state.player_captured = game_state.player_captured.duplicate()
+	sim_state.field_cards = game_state.field_cards.duplicate()
 	sim_state.opponent_captured = game_state.opponent_captured.duplicate()
+
+	var top_deck_card = game_state.deck[game_state.deck.size() - 1] if game_state.deck.size() > 0 else null
+	if top_deck_card != null:
+		guessed_cards = guessed_cards.filter(func(c: Card) -> bool:
+			return not c.equals(top_deck_card)
+		)
+
+		for i in range(game_state.deck.size() - 1):
+			sim_state.deck.append(guessed_cards.pop_back())
+
+		for i in range(game_state.player_hand.size()):
+			sim_state.player_hand.append(guessed_cards.pop_back())
+
+		sim_state.deck.append(top_deck_card)
+	else:
+		# I feel like this case shouldn't happen
+		for i in range(game_state.deck.size()):
+			sim_state.deck.append(guessed_cards.pop_back())
+
+		for i in range(game_state.player_hand.size()):
+			sim_state.player_hand.append(guessed_cards.pop_back())
+
 	sim_state.current_turn = game_state.current_turn
 	sim_state.current_turn_phase = game_state.current_turn_phase
 	sim_state.player_score = game_state.player_score.total_score
