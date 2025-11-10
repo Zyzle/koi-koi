@@ -3,6 +3,7 @@ extends Node
 
 const CARD_SCENE_PATH = "res://scenes/card_visual.tscn"
 const SCORING_PANEL_SCENE_PATH = "res://scenes/scoring_panel.tscn"
+const WIN_LOSE_PANEL_SCENE_PATH = "res://scenes/win_lose_panel.tscn"
 
 
 @onready var game_world: Node2D = %GameWorld
@@ -23,6 +24,7 @@ var card_registry: Dictionary[Card, CardVisual]
 var deal_registry: Array[Dictionary]
 var selected_card: CardVisual
 var scoring_panel: ScoringPanel
+var wld_panel: WinLosePanel
 
 func _create_card_visual(card: Card) -> CardVisual:
 	var card_scene = preload(CARD_SCENE_PATH)
@@ -53,15 +55,18 @@ func _highlight_matching_field_cards(card: Card) -> void:
 
 
 func _on_koi_koi_pressed() -> void:
-	print("UI: Player chose Koi-Koi")
 	scoring_panel.queue_free()
 	player_chose_koi_koi.emit()
 
 
 func _on_end_pressed() -> void:
-	print("UI: Player chose to end round")
 	scoring_panel.queue_free()
 	player_chose_end_round.emit()
+
+
+func _on_next_pressed() -> void:
+	wld_panel.queue_free()
+	game_state.advance_game_phase()
 
 
 func set_game_state(state: GameState) -> void:
@@ -121,8 +126,6 @@ func player_selected_card(card: Card) -> void:
 				card_visual.set_selected(false)
 				selected_card = null
 				return
-			else:
-				print("not playing card to field, state:", game_state.current_turn_phase)
 	else:
 		selected_card = null
 		
@@ -168,6 +171,19 @@ func player_card_to_field(card: Card) -> void:
 	selected_card = null
 
 
+## Handle when opponent plays a card from hand to field
+func opponent_card_to_field(card: Card) -> void:
+	var card_visual = _get_card_visual(card)
+	if card_visual:
+		card_visual.flip_card()
+		opponent_hand_container.remove_card(card_visual)
+		if field_container.all_slots_occupied():
+			field_container.open_next_slot()
+		var tween = field_container.add_card(card_visual, false)
+		await tween.finished
+		card_visual.connect_events()
+
+
 func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	var player_card_visual = _get_card_visual(player_card)
 	var field_card_visual = _get_card_visual(field_card)
@@ -188,7 +204,25 @@ func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 		await tween.finished
 
 
-func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
+func field_captured_by_opponent(opponent_card: Card, field_card: Card) -> void:
+	var opponent_card_visual = _get_card_visual(opponent_card)
+	var field_card_visual = _get_card_visual(field_card)
+
+	opponent_card_visual.flip_card()
+	opponent_hand_container.remove_card(opponent_card_visual)
+	field_container.remove_card(field_card_visual)
+	selected_card = null
+
+	if opponent_card_visual:
+		var tween = opponent_capture_area.capture_card(opponent_card_visual)
+		await tween.finished
+
+	if field_card_visual:
+		var tween = opponent_capture_area.capture_card(field_card_visual)
+		await tween.finished
+
+
+func field_captured_by_deck(deck_card: Card, field_card: Card, player: GameState.Turn) -> void:
 	var deck_card_visual = _get_card_visual(deck_card)
 	var field_card_visual = _get_card_visual(field_card)
 
@@ -197,18 +231,20 @@ func field_captured_by_deck(deck_card: Card, field_card: Card) -> void:
 	field_container.remove_card(field_card_visual)
 	selected_card = null
 
+	var capture_area = player_capture_area if player == GameState.Turn.PLAYER else opponent_capture_area
+
 	if deck_card_visual:
-		var tween = player_capture_area.capture_card(deck_card_visual)
+		var tween = capture_area.capture_card(deck_card_visual)
 		await tween.finished
 
 	if field_card_visual:
-		var tween = player_capture_area.capture_card(field_card_visual)
+		var tween = capture_area.capture_card(field_card_visual)
 		await tween.finished
 
 
 ## Set UI state for capture mode (player can capture from field)
 func set_capture_mode() -> void:
-	print("UI: Capture mode enabled")
+	pass
 	# Could add visual indicators here
 
 
@@ -220,7 +256,6 @@ func set_play_to_field_mode() -> void:
 
 ## Set UI state for deck capture mode (deck card can capture)
 func set_deck_capture_mode() -> void:
-	print("UI: Deck capture mode enabled")
 	# Could add visual indicators or highlight deck card
 	var top_card = deck_slot.get_top_card()
 	top_card.set_selected(true)
@@ -229,7 +264,6 @@ func set_deck_capture_mode() -> void:
 
 ## Flip the top deck card
 func flip_deck_card() -> void:
-	print("UI: Flipping deck card")
 	var top_card = deck_slot.get_top_card()
 	if top_card:
 		top_card.flip_card()
@@ -237,7 +271,6 @@ func flip_deck_card() -> void:
 
 ## Clean up UI state at end of turn
 func end_turn_cleanup() -> void:
-	print("UI: Cleaning up turn")
 	if selected_card:
 		selected_card.set_selected(false)
 		selected_card = null
@@ -256,7 +289,6 @@ func update_capture_numbers(for_turn: GameState.Turn, captured_cards: Array[Card
 
 
 func prompt_player_koi_koi() -> void:
-	print("UI: Prompting player for Koi-Koi decision")
 	var scoring_panel_scene = preload(SCORING_PANEL_SCENE_PATH)
 	scoring_panel = scoring_panel_scene.instantiate()
 	scoring_panel.position = Vector2(625, 140)
@@ -285,6 +317,11 @@ func update_round_wins(wins: Array[int]) -> void:
 	wins_player.assign(wins.map(func(w: int): return 1 if w == 1 else 0))
 	var wins_opponent: Array[int]
 	wins_opponent.assign(wins.map(func(w: int): return 1 if w == 2 else 0))
-	print("UI: Updating round wins display: ", wins_player, wins_opponent)
 	player_capture_area.set_coins(wins_player)
 	opponent_capture_area.set_coins(wins_opponent)
+	var wld_panel_scene = preload(WIN_LOSE_PANEL_SCENE_PATH)
+	wld_panel = wld_panel_scene.instantiate()
+	wld_panel.position = Vector2(625, 140)
+	wld_panel.set_game_state(game_state)
+	wld_panel.next_pressed.connect(_on_next_pressed)
+	game_world.add_child(wld_panel)
