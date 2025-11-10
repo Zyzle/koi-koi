@@ -188,6 +188,8 @@ func _on_card_moved(card: Card, from_to_location: String, move_also: Card) -> vo
 			ui_manager.field_captured_by_player(card, move_also)
 		"player_hand_field":
 			ui_manager.player_card_to_field(card)
+		"opponent_hand_field":
+			ui_manager.opponent_card_to_field(card)
 		"deck_field_captured":
 			ui_manager.field_captured_by_deck(card, move_also, game_state.current_turn)
 		"opponent_field_captured":

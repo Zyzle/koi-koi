@@ -171,6 +171,19 @@ func player_card_to_field(card: Card) -> void:
 	selected_card = null
 
 
+## Handle when opponent plays a card from hand to field
+func opponent_card_to_field(card: Card) -> void:
+	var card_visual = _get_card_visual(card)
+	if card_visual:
+		card_visual.flip_card()
+		opponent_hand_container.remove_card(card_visual)
+		if field_container.all_slots_occupied():
+			field_container.open_next_slot()
+		var tween = field_container.add_card(card_visual, false)
+		await tween.finished
+		card_visual.connect_events()
+
+
 func field_captured_by_player(player_card: Card, field_card: Card) -> void:
 	var player_card_visual = _get_card_visual(player_card)
 	var field_card_visual = _get_card_visual(field_card)
