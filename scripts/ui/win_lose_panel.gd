@@ -9,7 +9,6 @@ const DRAW_CALLOUT_TEXTURE_PATH = "res://assets/callout_tan.png"
 @onready var wld_label: Label = %WLDLabel
 @onready var opponent_score_label: Label = %OpponentScoreLabel
 @onready var player_score_label: Label = %PlayerScoreLabel
-@onready var next_button: TextureButton = %NextButton
 
 signal next_pressed
 

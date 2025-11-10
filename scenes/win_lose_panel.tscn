@@ -61,8 +61,8 @@ patch_margin_bottom = 50
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_right = 15
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
 
 [node name="WLDLabel" type="Label" parent="PanelContainer/MarginContainer"]
 unique_name_in_owner = true
@@ -143,7 +143,7 @@ text = "0 pts"
 layout_mode = 2
 alignment = 1
 
-[node name="TextureButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="NextButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(200, 80)
 layout_mode = 2
 texture_normal = ExtResource("5_034q4")
@@ -151,7 +151,7 @@ texture_pressed = ExtResource("6_eu41u")
 ignore_texture_size = true
 stretch_mode = 4
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/TextureButton"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/NextButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -167,4 +167,4 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "Next"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/TextureButton" to="." method="_on_texture_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/NextButton" to="." method="_on_texture_button_pressed"]

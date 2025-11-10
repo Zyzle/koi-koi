@@ -102,7 +102,6 @@ static func create_from_game_state(game_state: GameState) -> SimulatedState:
 	sim_state.current_turn_phase = game_state.current_turn_phase
 	sim_state.player_score = game_state.player_score.total_score
 	sim_state.opponent_score = game_state.opponent_score.total_score
-	print("Created simulated state: ", sim_state)
 	return sim_state
 
 

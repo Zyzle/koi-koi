@@ -55,19 +55,16 @@ func _highlight_matching_field_cards(card: Card) -> void:
 
 
 func _on_koi_koi_pressed() -> void:
-	print("UI: Player chose Koi-Koi")
 	scoring_panel.queue_free()
 	player_chose_koi_koi.emit()
 
 
 func _on_end_pressed() -> void:
-	print("UI: Player chose to end round")
 	scoring_panel.queue_free()
 	player_chose_end_round.emit()
 
 
 func _on_next_pressed() -> void:
-	print("UI: Next pressed on Win/Lose panel")
 	wld_panel.queue_free()
 	game_state.advance_game_phase()
 
@@ -129,8 +126,6 @@ func player_selected_card(card: Card) -> void:
 				card_visual.set_selected(false)
 				selected_card = null
 				return
-			else:
-				print("not playing card to field, state:", game_state.current_turn_phase)
 	else:
 		selected_card = null
 		
@@ -236,7 +231,7 @@ func field_captured_by_deck(deck_card: Card, field_card: Card, player: GameState
 
 ## Set UI state for capture mode (player can capture from field)
 func set_capture_mode() -> void:
-	print("UI: Capture mode enabled")
+	pass
 	# Could add visual indicators here
 
 
@@ -248,7 +243,6 @@ func set_play_to_field_mode() -> void:
 
 ## Set UI state for deck capture mode (deck card can capture)
 func set_deck_capture_mode() -> void:
-	print("UI: Deck capture mode enabled")
 	# Could add visual indicators or highlight deck card
 	var top_card = deck_slot.get_top_card()
 	top_card.set_selected(true)
@@ -257,7 +251,6 @@ func set_deck_capture_mode() -> void:
 
 ## Flip the top deck card
 func flip_deck_card() -> void:
-	print("UI: Flipping deck card")
 	var top_card = deck_slot.get_top_card()
 	if top_card:
 		top_card.flip_card()
@@ -265,7 +258,6 @@ func flip_deck_card() -> void:
 
 ## Clean up UI state at end of turn
 func end_turn_cleanup() -> void:
-	print("UI: Cleaning up turn")
 	if selected_card:
 		selected_card.set_selected(false)
 		selected_card = null
@@ -284,7 +276,6 @@ func update_capture_numbers(for_turn: GameState.Turn, captured_cards: Array[Card
 
 
 func prompt_player_koi_koi() -> void:
-	print("UI: Prompting player for Koi-Koi decision")
 	var scoring_panel_scene = preload(SCORING_PANEL_SCENE_PATH)
 	scoring_panel = scoring_panel_scene.instantiate()
 	scoring_panel.position = Vector2(625, 140)
@@ -313,7 +304,6 @@ func update_round_wins(wins: Array[int]) -> void:
 	wins_player.assign(wins.map(func(w: int): return 1 if w == 1 else 0))
 	var wins_opponent: Array[int]
 	wins_opponent.assign(wins.map(func(w: int): return 1 if w == 2 else 0))
-	print("UI: Updating round wins display: ", wins_player, wins_opponent)
 	player_capture_area.set_coins(wins_player)
 	opponent_capture_area.set_coins(wins_opponent)
 	var wld_panel_scene = preload(WIN_LOSE_PANEL_SCENE_PATH)

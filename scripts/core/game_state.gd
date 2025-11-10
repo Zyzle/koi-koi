@@ -116,7 +116,6 @@ signal capture_numbers_updated(for_turn: Turn, cards: Array[Card])
 
 func _arrays_have_same_content(arr1: Array, arr2: Array) -> bool:
 	if arr1.size() != arr2.size():
-		print("array sizes differ:", arr1.size(), arr2.size())
 		return false
 	
 	var temp_arr2 = arr2.duplicate()
@@ -124,10 +123,8 @@ func _arrays_have_same_content(arr1: Array, arr2: Array) -> bool:
 		if temp_arr2.has(item):
 			temp_arr2.erase(item)
 		else:
-			print("array contents differ:", item)
 			return false
 	
-	print("arrays have same content")
 	return true
 
 
@@ -141,7 +138,6 @@ func _reset_game_for_new_round() -> void:
 	player_score = Scoring.ScoreResult.new()
 	opponent_score = Scoring.ScoreResult.new()
 	round_number += 1
-	print("Starting round ", round_number)
 	reset_game.emit()
 
 
@@ -155,7 +151,6 @@ func add_cards_to_deck(cards: Array[Card]) -> void:
 
 func deal_card_to_player() -> void:
 	if deck.size() == 0:
-		print("Deck is empty, cannot deal to player")
 		return
 	var card = deck.pop_back()
 	card.make_player_card()
@@ -165,7 +160,6 @@ func deal_card_to_player() -> void:
 
 func deal_card_to_opponent() -> void:
 	if deck.size() == 0:
-		print("Deck is empty, cannot deal to opponent")
 		return
 	var card = deck.pop_back()
 	opponent_hand.append(card)
@@ -174,7 +168,6 @@ func deal_card_to_opponent() -> void:
 
 func deal_card_to_field() -> void:
 	if deck.size() == 0:
-		print("Deck is empty, cannot deal to field")
 		return
 	var card = deck.pop_back()
 	card.make_field_card()
@@ -194,6 +187,8 @@ func player_captured_cards(card1: Card, card2: Card) -> void:
 		field_cards.erase(card2)
 	else:
 		# card came from the deck
+		if not deck.has(card2):
+			print("ERROR: deck does not have card2 to capture:", card2)
 		deck.erase(card2)
 
 	player_captured.append(card2)
@@ -225,6 +220,8 @@ func opponent_captured_cards(card1: Card, card2: Card) -> void:
 	if field_cards.has(card2):
 		field_cards.erase(card2)
 	else:
+		if not deck.has(card2):
+			print("ERROR: deck does not have card2 to capture:", card2)
 		deck.erase(card2)
 	
 	opponent_captured.append(card2)
@@ -284,6 +281,7 @@ func start_opponent_turn() -> void:
 
 ## Check if the current player has any cards that can capture from the field
 func can_player_capture_from_field() -> bool:
+	print("DEBUG: Checking if player can capture from field: ", field_cards, field_cards.size())
 	for hand_card in player_hand:
 		for field_card in field_cards:
 			if hand_card.month == field_card.month:
@@ -292,6 +290,7 @@ func can_player_capture_from_field() -> bool:
 
 
 func can_opponent_capture_from_field() -> bool:
+	print("DEBUG: Checking if opponent can capture from field: ", field_cards, field_cards.size())
 	for hand_card in opponent_hand:
 		for field_card in field_cards:
 			if hand_card.month == field_card.month:
@@ -310,27 +309,22 @@ func can_card_capture_from_field(card: Card) -> bool:
 func advance_game_phase() -> void:
 	match current_phase:
 		Phase.NONE:
-			print("Advancing from NONE to START phase")
 			current_phase = Phase.START
 			# advance_game_phase()
 
 		Phase.START:
-			print("Advancing from START to DEAL phase")
 			_reset_game_for_new_round()
 			current_phase = Phase.DEAL
 
 		Phase.DEAL:
-			print("Advancing from DEAL to PLAY phase")
 			current_turn_phase = TurnPhase.HAND_FIELD_CAPTURE
 			current_phase = Phase.PLAY
 
 		Phase.PLAY:
-			print("Advancing from PLAY to ROUND_END phase")
 			# Check for end of round conditions here later
 			current_phase = Phase.ROUND_END
 
 		Phase.ROUND_END:
-			print("Advancing from ROUND_END to START phase")
 			current_phase = Phase.START
 			current_turn = Turn.NONE
 			current_turn_phase = TurnPhase.NONE
@@ -340,12 +334,10 @@ func advance_game_phase() -> void:
 func advance_turn_phase() -> void:
 	match current_turn_phase:
 		TurnPhase.HAND_FIELD_CAPTURE:
-			print("Advancing from HAND_FIELD_CAPTURE to PLAY_CARD_TO_FIELD")
 			# Player made a capture, now flip deck card
 			current_turn_phase = TurnPhase.FLIP_DECK_CARD
 			
 		TurnPhase.PLAY_CARD_TO_FIELD:
-			print("Advancing from PLAY_CARD_TO_FIELD to FLIP_DECK_CARD")
 			# Player played card to field, now flip deck card
 			current_turn_phase = TurnPhase.FLIP_DECK_CARD
 			
@@ -353,26 +345,21 @@ func advance_turn_phase() -> void:
 			# Check if deck card can capture
 			var deck_card = deck[deck.size() - 1]
 			if can_card_capture_from_field(deck_card):
-				print("Advancing from FLIP_DECK_CARD to DECK_FIELD_CAPTURE")
 				current_turn_phase = TurnPhase.DECK_FIELD_CAPTURE
 			else:
 				# Deck card goes to field, turn ends
-				print("Advancing from FLIP_DECK_CARD to SCORE")
 				deal_card_to_field()
 				current_turn_phase = TurnPhase.SCORE
 				
 		TurnPhase.DECK_FIELD_CAPTURE:
-			print("Advancing from DECK_FIELD_CAPTURE to SCORE")
 			# Deck capture completed, turn ends
 			current_turn_phase = TurnPhase.SCORE
 
 		TurnPhase.SCORE:
-			print("Advancing from SCORE to TURN_END")
 			# Scoring completed, turn ends
 			current_turn_phase = TurnPhase.TURN_END
 			
 		TurnPhase.TURN_END:
-			print("Advancing from TURN_END to new turn")
 			# Switch to opponent turn
 			if current_turn == Turn.PLAYER:
 				current_turn = Turn.OPPONENT

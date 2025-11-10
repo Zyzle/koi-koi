@@ -18,7 +18,6 @@ func _ready() -> void:
 
 
 func _initialize_game() -> void:
-	print("GameManager: Initializing game")
 	# Pass GameState to UIManager
 	ui_manager.set_game_state(game_state)
 	_connect_signals()
@@ -60,17 +59,14 @@ func _setup_new_game() -> void:
 
 # Game flow signal handlers
 func _on_phase_changed(new_phase: GameState.Phase) -> void:
-	print("Phase changed to: ", new_phase)
 	match new_phase:
 		GameState.Phase.START:
-			print("Starting new round...")
 			# Setup for new round
 			_setup_new_game()
 			# Advance to DEAL phase
 			game_state.advance_game_phase()
 
 		GameState.Phase.DEAL:
-			print("Dealing cards...")
 			for i in range(8):
 				game_state.deal_card_to_player()
 				game_state.deal_card_to_opponent()
@@ -79,16 +75,13 @@ func _on_phase_changed(new_phase: GameState.Phase) -> void:
 			# Note: advance_game_phase is called by _on_deal_finished signal
 
 		GameState.Phase.PLAY:
-			print("Starting play phase")
 			game_state.current_turn = GameState.Turn.PLAYER
 		
 		GameState.Phase.ROUND_END:
-			print("Round ended. Calculating final scores...")
 			game_state.advance_game_phase()
 
 
 func _on_turn_changed(new_turn: GameState.Turn) -> void:
-	print("Turn changed to: ", new_turn)
 	if new_turn == GameState.Turn.PLAYER:
 		# Start the player's turn sequence
 		game_state.start_turn()
@@ -101,7 +94,6 @@ func _on_turn_changed(new_turn: GameState.Turn) -> void:
 
 
 func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
-	print("Turn phase changed to: ", new_turn_phase)
 	if game_state.current_turn == GameState.Turn.OPPONENT:
 		# AI turn phases are handled in _make_ai_move
 		_on_turn_phase_changed_for_opponent(new_turn_phase)
@@ -113,35 +105,27 @@ func _on_turn_phase_changed(new_turn_phase: GameState.TurnPhase) -> void:
 func _on_turn_phase_changed_for_player(new_turn_phase: GameState.TurnPhase) -> void:
 	match new_turn_phase:
 		GameState.TurnPhase.HAND_FIELD_CAPTURE:
-			print("Player can capture from field - waiting for selection")
 			ui_manager.set_capture_mode()
 			
 		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
-			print("Player must play a card to field - waiting for selection")
 			ui_manager.set_play_to_field_mode()
 			
 		GameState.TurnPhase.FLIP_DECK_CARD:
-			print("Flipping deck card")
 			ui_manager.flip_deck_card()
 			# Automatically advance after animation
 			await get_tree().create_timer(1.0).timeout
 			game_state.advance_turn_phase()
 			
 		GameState.TurnPhase.DECK_FIELD_CAPTURE:
-			print("Deck card can capture - waiting for field selection")
 			ui_manager.set_deck_capture_mode()
 
 		GameState.TurnPhase.SCORE:
-			print("Calculating scores")
 			var turn_scores = Scoring.calculate_score(game_state.player_captured)
 			var can_koi_koi = game_state.can_player_koi_koi(turn_scores)
 			if not can_koi_koi:
 				game_state.advance_turn_phase()
 
-			print("Turn scores: ", turn_scores)
-			
 		GameState.TurnPhase.TURN_END:
-			print("Turn ending")
 			ui_manager.end_turn_cleanup()
 			game_state.advance_turn_phase()
 
@@ -149,37 +133,29 @@ func _on_turn_phase_changed_for_player(new_turn_phase: GameState.TurnPhase) -> v
 func _on_turn_phase_changed_for_opponent(new_turn_phase: GameState.TurnPhase) -> void:
 	match new_turn_phase:
 		GameState.TurnPhase.HAND_FIELD_CAPTURE:
-			print("Opponent can capture from field - waiting for selection")
 			_make_ai_move()
 			
 		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
-			print("Opponent must play a card to field - waiting for selection")
 			_make_ai_move()
 			
 		GameState.TurnPhase.FLIP_DECK_CARD:
-			print("Flipping deck card")
 			ui_manager.flip_deck_card()
 			# Automatically advance after animation
 			await get_tree().create_timer(1.0).timeout
 			game_state.advance_turn_phase()
 			
 		GameState.TurnPhase.DECK_FIELD_CAPTURE:
-			print("Deck card can capture - waiting for field selection")
 			_make_ai_move()
 
 		GameState.TurnPhase.SCORE:
-			print("Calculating scores")
 			var turn_scores = Scoring.calculate_score(game_state.opponent_captured)
 			var can_koi_koi = game_state.can_opponent_koi_koi(turn_scores)
 			if not can_koi_koi:
 				game_state.advance_turn_phase()
 			else:
 				_make_ai_move()
-
-			print("Turn scores: ", turn_scores)
 			
 		GameState.TurnPhase.TURN_END:
-			print("Turn ending")
 			ui_manager.end_turn_cleanup()
 			game_state.advance_turn_phase()
 
@@ -228,19 +204,15 @@ func _on_player_chose_koi_koi() -> void:
 
 
 func _on_player_chose_end_round() -> void:
-	print("GameManager: Player chose to end round")
 	game_state.end_round(1)
 
 
 ## AI opponent makes a move using MCTS
 func _make_ai_move() -> void:
-	print("GameManager: AI thinking...")
 	var action = ai_player.make_move(game_state)
 	if action:
-		print("GameManager: AI chose action: ", action.get_description())
 		_execute_ai_action(action)
 	else:
-		print("GameManager: AI couldn't find a move, ending turn")
 		game_state.advance_turn_phase()
 		
 
@@ -265,23 +237,18 @@ func _execute_ai_action(action: MCTSAction) -> void:
 			
 		MCTSAction.ActionType.KOI_KOI_YES:
 			# AI continues playing
-			print("GameManager: AI chose koi-koi!")
 			game_state.advance_turn_phase()
 			
 		MCTSAction.ActionType.KOI_KOI_NO:
 			# AI ends round
-			print("GameManager: AI ends round")
 			game_state.end_round(2) # 2 = opponent wins
 
 
 # Controller methods - handle user input and decide what to do
 func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
-	print("GameManager: Player clicked card: ", clicked_card_visual.card_data)
-	
 	# Only allow card selection during appropriate turn phases
 	if not (game_state.current_turn_phase == GameState.TurnPhase.HAND_FIELD_CAPTURE or
 			game_state.current_turn_phase == GameState.TurnPhase.PLAY_CARD_TO_FIELD):
-		print("Wrong phase for selecting card: ", game_state.current_turn_phase)
 		return
 	
 	# Game logic decides what happens
@@ -290,7 +257,6 @@ func on_player_card_clicked(clicked_card_visual: CardVisual) -> void:
 		game_state.players_chosen_card = null
 	else:
 		# Select new card
-		print("Selecting card for action")
 		game_state.players_chosen_card = clicked_card_visual.card_data
 
 
@@ -311,7 +277,7 @@ func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
 			
 		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
 			# This shouldn't happen - player should play to field, not capture
-			print("Cannot capture during PLAY_CARD_TO_FIELD phase")
+			print("WARNING: Cannot capture during PLAY_CARD_TO_FIELD phase")
 
 		GameState.TurnPhase.DECK_FIELD_CAPTURE:
 			# Player is capturing with the deck card

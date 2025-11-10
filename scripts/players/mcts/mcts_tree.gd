@@ -39,14 +39,10 @@ func search() -> MCTSAction:
 		_backpropagate(simulation_node, result)
 		
 		iterations += 1
-
-	print("finished iterations")
 	
 	# Return action leading to most visited child
 	var best_child = root.get_most_visited_child()
 	if best_child:
-		print("MCTS: Ran %d iterations in %d ms" % [iterations, Time.get_ticks_msec() - start_time])
-		print("MCTS: Best action: %s (visits: %d, wins: %.2f)" % [best_child.action.get_description(), best_child.visits, best_child.wins])
 		return best_child.action
 	
 	# Fallback to random legal action
