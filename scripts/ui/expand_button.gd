@@ -9,5 +9,3 @@ func _ready():
 func _on_label_resized():
 	if label_node.size.x > self.size.x:
 		self.size.x = label_node.size.x
-	# if label_node.size.y > self.size.y:
-	# 	self.size.y = label_node.size.y
