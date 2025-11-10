@@ -282,7 +282,6 @@ func start_opponent_turn() -> void:
 
 ## Check if the current player has any cards that can capture from the field
 func can_player_capture_from_field() -> bool:
-	print("DEBUG: Checking if player can capture from field: ", field_cards, field_cards.size())
 	for hand_card in player_hand:
 		for field_card in field_cards:
 			if hand_card.month == field_card.month:
