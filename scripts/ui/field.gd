@@ -34,8 +34,7 @@ func add_card(card_visual: CardVisual, _and_flip) -> Tween:
 			card_visual.flip_card()
 
 			var tween = get_tree().create_tween()
-			# TODO: Temporarily slow down animations for debugging
-			tween.tween_property(card_visual, "global_position", target_position, 0.5)
+			tween.tween_property(card_visual, "global_position", target_position, 0.25)
 			return tween
 
 	return null
