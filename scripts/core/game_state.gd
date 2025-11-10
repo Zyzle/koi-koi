@@ -93,6 +93,7 @@ var player_captured: Array[Card]
 var opponent_captured: Array[Card]
 var player_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
 var opponent_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
+# TODO: Use rounds_to_play for supporting configurable number of rounds in future versions.
 var rounds_to_play: int = 12
 ## Tracks wins for each round, 0 for no win, 1 for player win, 2 for opponent win
 var round_wins: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
