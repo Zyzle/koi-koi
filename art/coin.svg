@@ -9,6 +9,9 @@
    id="svg1"
    inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
    sodipodi:docname="coin.svg"
+   inkscape:export-filename="../assets/coin.png"
+   inkscape:export-xdpi="8"
+   inkscape:export-ydpi="8"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -24,23 +27,58 @@
      inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="0.85594976"
-     inkscape:cx="164.14515"
-     inkscape:cy="318.35981"
+     inkscape:zoom="1.0030635"
+     inkscape:cx="234.78076"
+     inkscape:cy="326.00131"
      inkscape:window-width="1792"
-     inkscape:window-height="976"
+     inkscape:window-height="977"
      inkscape:window-x="0"
-     inkscape:window-y="31"
+     inkscape:window-y="30"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
      id="defs1">
+    <inkscape:path-effect
+       effect="powerclip"
+       message=""
+       id="path-effect3"
+       is_visible="true"
+       lpeversion="1"
+       inverse="true"
+       flatten="false"
+       hide_clip="false" />
+    <filter
+       id="selectable_hidder_filter"
+       width="1"
+       height="1"
+       x="0"
+       y="0"
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="LPE boolean visibility">
+      <feComposite
+         id="boolops_hidder_primitive"
+         result="composite1"
+         operator="arithmetic"
+         in2="SourceGraphic"
+         in="BackgroundImage" />
+    </filter>
+    <inkscape:path-effect
+       effect="bool_op"
+       operand-path=""
+       id="path-effect2"
+       is_visible="true"
+       lpeversion="1"
+       operation="union"
+       swap-operands="false"
+       filltype-this="from-curve"
+       filter=""
+       filltype-operand="from-curve" />
     <pattern
        inkscape:collect="always"
        xlink:href="#ap108"
        preserveAspectRatio="xMidYMid"
        id="pattern7"
-       patternTransform="matrix(0.3,0,0,0.3,1180.0034,543.26185)"
+       patternTransform="matrix(0.3,0,0,0.3,1180.0035,543.26183)"
        x="0"
        y="0" />
     <pattern
@@ -70,49 +108,73 @@
          x="763.61322"
          y="452.82422" />
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3">
+      <path
+         id="path3"
+         d="M 60.325003,58.208336 H 98.425 c 1.172636,0 2.11667,0.944033 2.11667,2.116667 V 98.425 c 0,1.172636 -0.944034,2.11667 -2.11667,2.11667 H 60.325003 c -1.172634,0 -2.116667,-0.944034 -2.116667,-2.11667 V 60.325003 c 0,-1.172634 0.944033,-2.116667 2.116667,-2.116667 z"
+         style="display:none;fill:none;fill-opacity:1;stroke-width:0.2672;stroke-dasharray:none"
+         clip-path="none" />
+      <path
+         id="lpe_path-effect3"
+         style="fill:none;fill-opacity:1;stroke-width:0.2672;stroke-dasharray:none"
+         class="powerclip"
+         d="M -5,-5 H 163.75 V 163.75 H -5 Z m 65.325003,63.208336 c -1.172634,0 -2.116667,0.944033 -2.116667,2.116667 V 98.425 c 0,1.172636 0.944033,2.11667 2.116667,2.11667 H 98.425 c 1.172636,0 2.11667,-0.944034 2.11667,-2.11667 V 60.325003 c 0,-1.172634 -0.944034,-2.116667 -2.11667,-2.116667 z" />
+    </clipPath>
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <circle
-       style="fill:#d4aa00;stroke-width:0.264999"
-       id="path1"
-       cx="79.375"
-       cy="79.375"
-       r="79.375"
-       inkscape:export-filename="path1.png"
-       inkscape:export-xdpi="48"
-       inkscape:export-ydpi="48" />
-    <circle
-       style="fill:#8a6d00;stroke-width:0.331249;fill-opacity:1"
-       id="path2"
-       cx="79.375"
-       cy="79.375"
-       r="66.145836" />
-    <circle
-       style="fill:url(#pattern7);fill-opacity:1;stroke-width:0.331249"
-       id="path2-4"
-       cx="79.375"
-       cy="79.375"
-       r="66.145836" />
-    <rect
-       style="fill:#d4aa00;fill-opacity:1;stroke-width:0.334;stroke-dasharray:none"
-       id="rect7"
-       width="52.916668"
-       height="52.916668"
-       x="52.916664"
-       y="52.916664"
-       rx="2.6458333"
-       ry="2.6458333" />
-    <rect
-       style="fill:#ff00ff;fill-opacity:1;stroke-width:0.2672;stroke-dasharray:none"
-       id="rect7-1"
-       width="42.333332"
-       height="42.333332"
-       x="58.208336"
-       y="58.208336"
-       rx="2.1166666"
-       ry="2.1166666" />
+    <g
+       id="g2"
+       clip-path="url(#clipPath3)"
+       inkscape:path-effect="#path-effect3">
+      <g
+         id="g1">
+        <path
+           style="fill:#d4aa00;stroke-width:0.264999"
+           id="path1"
+           inkscape:export-filename="path1.png"
+           inkscape:export-xdpi="48"
+           inkscape:export-ydpi="48"
+           sodipodi:type="arc"
+           sodipodi:cx="79.375"
+           sodipodi:cy="79.375"
+           sodipodi:rx="79.375"
+           sodipodi:ry="79.375"
+           d="M 158.75,79.375 A 79.375,79.375 0 0 1 79.375,158.75 79.375,79.375 0 0 1 0,79.375 79.375,79.375 0 0 1 79.375,0 79.375,79.375 0 0 1 158.75,79.375 Z" />
+        <path
+           style="fill:#8a6d00;fill-opacity:1;stroke-width:0.331249"
+           id="path2"
+           sodipodi:type="arc"
+           sodipodi:cx="79.375"
+           sodipodi:cy="79.375"
+           sodipodi:rx="66.145836"
+           sodipodi:ry="66.145836"
+           d="M 145.52084,79.375 A 66.145836,66.145836 0 0 1 79.375,145.52084 66.145836,66.145836 0 0 1 13.229164,79.375 66.145836,66.145836 0 0 1 79.375,13.229164 66.145836,66.145836 0 0 1 145.52084,79.375 Z" />
+        <path
+           style="fill:#d4aa00;fill-opacity:1;stroke-width:0.334;stroke-dasharray:none"
+           id="rect7"
+           width="52.916668"
+           height="52.916668"
+           x="52.916664"
+           y="52.916664"
+           rx="2.6458333"
+           ry="2.6458333"
+           sodipodi:type="rect"
+           d="M 55.562497,52.916664 H 103.1875 c 1.46579,0 2.64583,1.180042 2.64583,2.645833 V 103.1875 c 0,1.46579 -1.18004,2.64583 -2.64583,2.64583 H 55.562497 c -1.465791,0 -2.645833,-1.18004 -2.645833,-2.64583 V 55.562497 c 0,-1.465791 1.180042,-2.645833 2.645833,-2.645833 z" />
+      </g>
+      <path
+         style="fill:url(#pattern7);fill-opacity:1;stroke-width:0.331249"
+         id="path2-4"
+         sodipodi:type="arc"
+         sodipodi:cx="79.375"
+         sodipodi:cy="79.375"
+         sodipodi:rx="66.145836"
+         sodipodi:ry="66.145836"
+         d="M 145.52084,79.375 A 66.145836,66.145836 0 0 1 79.375,145.52084 66.145836,66.145836 0 0 1 13.229164,79.375 66.145836,66.145836 0 0 1 79.375,13.229164 66.145836,66.145836 0 0 1 145.52084,79.375 Z" />
+    </g>
   </g>
 </svg>

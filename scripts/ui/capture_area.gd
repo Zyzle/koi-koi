@@ -63,6 +63,16 @@ func set_capture_labels(cards: Array[Card]) -> void:
 	plains_label.text = str(type_counts[Card.CardType.PLAIN]) if type_counts[Card.CardType.PLAIN] > 0 else ""
 
 
+func setup_coins(num_coins: int) -> void:
+	for child in coin_container.get_children():
+		child.queue_free()
+	
+	for i in range(num_coins):
+		var coin_sprite = TextureRect.new()
+		coin_sprite.texture = load(COIN_DISABLED)
+		coin_container.add_child(coin_sprite)
+
+
 func set_coins(coins: Array[int]) -> void:
 	var coin_sprites = coin_container.get_children()
 
