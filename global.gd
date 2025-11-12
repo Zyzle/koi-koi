@@ -1,4 +1,5 @@
 extends Node
+class_name Global
 
-var game_rounds: int = 3
-var ai_difficulty: AIPlayer.Difficulty = AIPlayer.Difficulty.EASY
+@export var game_rounds: int = 3
+@export var ai_difficulty: AIPlayer.Difficulty = AIPlayer.Difficulty.EASY
