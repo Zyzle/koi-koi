@@ -24,6 +24,3 @@ func start_game() -> void:
 	game_settings_instance.connect("settings_confirmed", _on_game_settings_confirmed)
 	add_child(game_settings_instance)
 	move_child(game_settings_instance, 0)
-	# var game_instance = main_game.instantiate()
-	# add_child(game_instance)
-	# move_child(game_instance, 0)
