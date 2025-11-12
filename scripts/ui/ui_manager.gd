@@ -71,6 +71,8 @@ func _on_next_pressed() -> void:
 
 func set_game_state(state: GameState) -> void:
 	game_state = state
+	player_capture_area.setup_coins(game_state.rounds_to_play)
+	opponent_capture_area.setup_coins(game_state.rounds_to_play)
 
 
 func setup_deck_display(deck: Array[Card]) -> void:

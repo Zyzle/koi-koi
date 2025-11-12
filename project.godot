@@ -16,6 +16,10 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 boot_splash/image="uid://xoru7450iri7"
 config/icon="uid://baswp1dqo8x30"
 
+[autoload]
+
+Global="*res://global.gd"
+
 [display]
 
 window/size/viewport_width=1920

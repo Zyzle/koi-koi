@@ -8,8 +8,9 @@ var ui_manager: UIManager
 
 func _ready() -> void:
 	game_state = GameState.new()
+	game_state.set_rounds(Global.game_rounds)
 	ai_player = AIPlayer.new()
-	ai_player.set_difficulty(AIPlayer.Difficulty.MEDIUM)
+	ai_player.set_difficulty(Global.ai_difficulty)
 	ui_manager = get_node("../UIManager")
 	ui_manager.game_manager = self
 	

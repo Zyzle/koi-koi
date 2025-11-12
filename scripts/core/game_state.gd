@@ -93,10 +93,9 @@ var player_captured: Array[Card]
 var opponent_captured: Array[Card]
 var player_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
 var opponent_score: Scoring.ScoreResult = Scoring.ScoreResult.new()
-# TODO: Use rounds_to_play for supporting configurable number of rounds in future versions.
-var rounds_to_play: int = 12
+var rounds_to_play: int
 ## Tracks wins for each round, 0 for no win, 1 for player win, 2 for opponent win
-var round_wins: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+var round_wins: Array[int]
 var player_running_score: int = 0
 var opponent_running_score: int = 0
 
@@ -140,6 +139,13 @@ func _reset_game_for_new_round() -> void:
 	opponent_score = Scoring.ScoreResult.new()
 	round_number += 1
 	reset_game.emit()
+
+
+func set_rounds(rounds: int) -> void:
+	rounds_to_play = rounds
+	round_wins = []
+	for i in range(rounds):
+		round_wins.append(0)
 
 
 ## Add a set of `Card` instances to the deck and shuffle

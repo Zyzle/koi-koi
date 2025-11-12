@@ -3,8 +3,8 @@ extends Node2D
 
 const CARD_REDUCED_SCALE = 0.5
 const CARD_REDUCED_WIDTH = 90 * CARD_REDUCED_SCALE
-const COIN = "res://assets/coin.png"
-const COIN_DISABLED = "res://assets/coin_disabled.png"
+const COIN = preload("res://assets/coin.png")
+const COIN_DISABLED = preload("res://assets/coin_disabled.png")
 
 @onready var brights: Line = $BrightsLine
 @onready var ribbons: Line = $RibbonsLine
@@ -63,11 +63,21 @@ func set_capture_labels(cards: Array[Card]) -> void:
 	plains_label.text = str(type_counts[Card.CardType.PLAIN]) if type_counts[Card.CardType.PLAIN] > 0 else ""
 
 
+func setup_coins(num_coins: int) -> void:
+	for child in coin_container.get_children():
+		child.queue_free()
+	
+	for i in range(num_coins):
+		var coin_sprite = TextureRect.new()
+		coin_sprite.texture = COIN_DISABLED
+		coin_container.add_child(coin_sprite)
+
+
 func set_coins(coins: Array[int]) -> void:
 	var coin_sprites = coin_container.get_children()
 
 	for i in range(coin_sprites.size()):
-		var coin_texture = load(COIN) if coins[i] == 1 else load(COIN_DISABLED)
+		var coin_texture = COIN if coins[i] == 1 else COIN_DISABLED
 		var sprite = coin_sprites[i] as TextureRect
 		sprite.texture = coin_texture
 		
