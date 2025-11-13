@@ -13,7 +13,10 @@ enum YAKU_TYPE {
 	BLUE_TANZAKU,
 	TANE,
 	TANZAKU,
-	KASU
+	KASU,
+	# Instant win yakus (not scored normally)
+	TESHI,
+	KUTTSUKI
 }
 
 const YAKU_NAMES_MAP: Dictionary[YAKU_TYPE, Array] = {
@@ -29,7 +32,9 @@ const YAKU_NAMES_MAP: Dictionary[YAKU_TYPE, Array] = {
 	YAKU_TYPE.BLUE_TANZAKU: ["Blue Tanzaku", "(青短)"],
 	YAKU_TYPE.TANE: ["Tane", "(タネ)"],
 	YAKU_TYPE.TANZAKU: ["Tanzaku", "(短冊)"],
-	YAKU_TYPE.KASU: ["Kasu", "(カス)"]
+	YAKU_TYPE.KASU: ["Kasu", "(カス)"],
+	YAKU_TYPE.TESHI: ["Teshi (Instant Win)", "(手四)"],
+	YAKU_TYPE.KUTTSUKI: ["Kuttsuki (Instant Win)", "(くっつき)"]
 }
 
 class ScoreResult:
@@ -40,6 +45,42 @@ class ScoreResult:
 
 	func _to_string() -> String:
 		return "ScoreResult(total_score=%d, yaku_achieved=%s)" % [total_score, yaku_achieved]
+
+
+static func check_instant_hand_win(hand_cards: Array[Card]) -> ScoreResult:
+	var month_counts = {}
+
+	for card in hand_cards:
+		month_counts[card.month] = month_counts.get(card.month, 0) + 1
+
+	for month in month_counts.keys():
+		if month_counts[month] == 4:
+			var score_details = ScoreResult.new()
+			score_details.total_score = 6
+			score_details.yaku_achieved = [YAKU_TYPE.TESHI]
+			score_details.yaku_cards[YAKU_TYPE.TESHI] = hand_cards.filter(func(card: Card):
+				return card.month == month
+			)
+			return score_details
+
+	var num_pairs = month_counts.values().filter(func(count: int):
+		return count == 2
+	).size()
+
+	if num_pairs == 4:
+		var score_details = ScoreResult.new()
+		score_details.total_score = 6
+		score_details.yaku_achieved = [YAKU_TYPE.KUTTSUKI]
+		var kuttsuki_cards = []
+		for month in month_counts.keys():
+			if month_counts[month] == 2:
+				kuttsuki_cards += hand_cards.filter(func(card: Card):
+					return card.month == month
+				)
+		score_details.yaku_cards[YAKU_TYPE.KUTTSUKI] = kuttsuki_cards
+		return score_details
+
+	return null
 
 
 static func calculate_score(captured_cards: Array[Card]) -> ScoreResult:

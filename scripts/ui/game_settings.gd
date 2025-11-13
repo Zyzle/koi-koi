@@ -36,7 +36,4 @@ func _on_go_button_pressed():
 		ai_level_hard:
 			ai_difficulty = AIPlayer.Difficulty.HARD
 
-	print("Selected Rounds: %d" % rounds)
-	print("Selected AI Level: %s" % ai_difficulty)
-
 	settings_confirmed.emit(rounds, ai_difficulty)
