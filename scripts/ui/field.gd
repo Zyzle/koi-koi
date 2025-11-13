@@ -43,6 +43,8 @@ func add_card(card_visual: CardVisual, _and_flip) -> Tween:
 ## Remove a CardVisual from the field
 func remove_card(card_visual: CardVisual) -> void:
 	field.erase(card_visual)
+	# no need to free the card_visual as it will be reparented
+	# in a subsequent call
 	# Find the slot containing this card and clear it
 	for slot in field_slots:
 		if slot.card_visual == card_visual:
