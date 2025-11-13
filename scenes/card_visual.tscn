@@ -137,6 +137,7 @@ occluder = SubResource("OccluderPolygon2D_welkc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_cgfjn")
+disabled = true
 
 [node name="CardBackImage" type="Sprite2D" parent="."]
 texture = SubResource("CanvasTexture_rmpoq")

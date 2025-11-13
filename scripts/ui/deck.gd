@@ -10,6 +10,8 @@ func add_card(card_visual: CardVisual) -> void:
 
 func remove_card(card_visual: CardVisual) -> void:
 	cards.erase(card_visual)
+	# there's no need to free the visual here as
+	# remove_card is only used before reparent
 
 
 func get_top_card() -> CardVisual:
@@ -19,4 +21,7 @@ func get_top_card() -> CardVisual:
 
 
 func clear_all_cards() -> void:
+	for card in cards:
+		if is_instance_valid(card):
+			card.queue_free()
 	cards.clear()

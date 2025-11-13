@@ -42,12 +42,14 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 
 
 func connect_events():
+	$Area2D/CollisionShape2D.disabled = false
 	$Area2D.mouse_entered.connect(_on_area_2d_mouse_entered)
 	$Area2D.mouse_exited.connect(_on_area_2d_mouse_exited)
 	$Area2D.input_event.connect(_on_area_2d_input_event)
 
 
 func disconnect_events():
+	$Area2D/CollisionShape2D.disabled = true
 	$Area2D.mouse_entered.disconnect(_on_area_2d_mouse_entered)
 	$Area2D.mouse_exited.disconnect(_on_area_2d_mouse_exited)
 	$Area2D.input_event.disconnect(_on_area_2d_input_event)

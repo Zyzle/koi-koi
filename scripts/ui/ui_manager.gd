@@ -321,6 +321,11 @@ func update_round_wins(wins: Array[int]) -> void:
 	wins_opponent.assign(wins.map(func(w: int): return 1 if w == 2 else 0))
 	player_capture_area.set_coins(wins_player)
 	opponent_capture_area.set_coins(wins_opponent)
+	
+	# Free existing panel if it exists
+	if wld_panel and is_instance_valid(wld_panel):
+		wld_panel.queue_free()
+	
 	var wld_panel_scene = preload(WIN_LOSE_PANEL_SCENE_PATH)
 	wld_panel = wld_panel_scene.instantiate()
 	wld_panel.position = Vector2(625, 140)

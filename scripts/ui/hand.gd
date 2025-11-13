@@ -34,6 +34,8 @@ func add_card(card_visual: CardVisual, and_flip: bool = false) -> Tween:
 
 
 func remove_card(card_visual: CardVisual) -> void:
+	# no need to free the card_visual as it will be reparented
+	# in a subsequent call
 	if hand.has(card_visual):
 		hand.erase(card_visual)
 		_tighten_hand_layout()
