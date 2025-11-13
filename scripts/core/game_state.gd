@@ -141,6 +141,20 @@ func _reset_game_for_new_round() -> void:
 	reset_game.emit()
 
 
+func _check_instant_wins() -> void:
+	# check if 4 cards from the same month have been dealt to either player
+	var player_win = Scoring.check_instant_hand_win(player_hand)
+	var opponent_win = Scoring.check_instant_hand_win(opponent_hand)
+
+	if player_win != null:
+		player_score = player_win
+		end_round(1)
+	
+	if opponent_win != null:
+		opponent_score = opponent_win
+		end_round(2)
+
+
 func set_rounds(rounds: int) -> void:
 	rounds_to_play = rounds
 	round_wins = []
@@ -195,7 +209,7 @@ func player_captured_cards(card1: Card, card2: Card) -> void:
 	else:
 		# card came from the deck
 		if not deck.has(card2):
-			print("ERROR: deck does not have card2 to capture:", card2)
+			push_error("ERROR: deck does not have card2 to capture:", card2)
 		deck.erase(card2)
 
 	player_captured.append(card2)
@@ -228,7 +242,7 @@ func opponent_captured_cards(card1: Card, card2: Card) -> void:
 		field_cards.erase(card2)
 	else:
 		if not deck.has(card2):
-			print("ERROR: deck does not have card2 to capture:", card2)
+			push_error("ERROR: deck does not have card2 to capture:", card2)
 		deck.erase(card2)
 	
 	opponent_captured.append(card2)
@@ -296,7 +310,6 @@ func can_player_capture_from_field() -> bool:
 
 
 func can_opponent_capture_from_field() -> bool:
-	print("DEBUG: Checking if opponent can capture from field: ", field_cards, field_cards.size())
 	for hand_card in opponent_hand:
 		for field_card in field_cards:
 			if hand_card.month == field_card.month:
@@ -323,6 +336,7 @@ func advance_game_phase() -> void:
 			current_phase = Phase.DEAL
 
 		Phase.DEAL:
+			_check_instant_wins()
 			current_turn_phase = TurnPhase.HAND_FIELD_CAPTURE
 			current_phase = Phase.PLAY
 

@@ -81,17 +81,57 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -697.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_constants/margin_left = 45
+theme_override_constants/margin_right = 45
 theme_override_constants/margin_bottom = 45
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="YakuList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme = ExtResource("3_nvy13")
+theme_override_colors/font_color = Color(0.3529412, 0.73333335, 0.99607843, 1)
+theme_override_font_sizes/font_size = 45
+text = "Current Score:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScoreLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("3_nvy13")
+theme_override_colors/font_color = Color(0.3529412, 0.73333335, 0.99607843, 1)
+theme_override_font_sizes/font_size = 45
+text = "0 pts"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-size_flags_horizontal = 4
 theme_override_constants/separation = 80
+alignment = 1
 
-[node name="KoiKoiButton" type="TextureButton" parent="MarginContainer/HBoxContainer"]
+[node name="KoiKoiButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -101,7 +141,7 @@ texture_disabled = ExtResource("7_0wngi")
 ignore_texture_size = true
 stretch_mode = 4
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/KoiKoiButton"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/KoiKoiButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -117,7 +157,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "Koi Koi"
 
-[node name="EndButton" type="TextureButton" parent="MarginContainer/HBoxContainer"]
+[node name="EndButton" type="TextureButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -126,7 +166,7 @@ texture_pressed = ExtResource("8_0wngi")
 ignore_texture_size = true
 stretch_mode = 4
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/EndButton"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/EndButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -142,48 +182,5 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "End"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-layout_mode = 0
-offset_top = 585.5
-offset_right = 670.0
-offset_bottom = 637.5
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="Label" type="Label" parent="HBoxContainer"]
-layout_mode = 2
-theme = ExtResource("3_nvy13")
-theme_override_colors/font_color = Color(0.3529412, 0.73333335, 0.99607843, 1)
-theme_override_font_sizes/font_size = 45
-text = "Score:"
-
-[node name="ScoreLabel" type="Label" parent="HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme = ExtResource("3_nvy13")
-theme_override_colors/font_color = Color(0.3529412, 0.73333335, 0.99607843, 1)
-theme_override_font_sizes/font_size = 45
-text = "0 pts"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = 25.0
-offset_top = -285.0
-offset_right = -25.0
-offset_bottom = 165.0
-grow_horizontal = 2
-grow_vertical = 2
-horizontal_scroll_mode = 0
-
-[node name="YakuList" type="VBoxContainer" parent="ScrollContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[connection signal="pressed" from="MarginContainer/HBoxContainer/KoiKoiButton" to="." method="_on_koi_koi_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/EndButton" to="." method="_on_end_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/KoiKoiButton" to="." method="_on_koi_koi_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/EndButton" to="." method="_on_end_button_pressed"]

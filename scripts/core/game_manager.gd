@@ -280,7 +280,7 @@ func on_field_card_clicked(clicked_card_visual: CardVisual) -> void:
 			
 		GameState.TurnPhase.PLAY_CARD_TO_FIELD:
 			# This shouldn't happen - player should play to field, not capture
-			print("WARNING: Cannot capture during PLAY_CARD_TO_FIELD phase")
+			push_warning("WARNING: Cannot capture during PLAY_CARD_TO_FIELD phase")
 
 		GameState.TurnPhase.DECK_FIELD_CAPTURE:
 			# Player is capturing with the deck card

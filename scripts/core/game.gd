@@ -10,7 +10,6 @@ func _on_main_menu_start_game():
 
 
 func _on_game_settings_confirmed(rounds: int, ai_difficulty: AIPlayer.Difficulty) -> void:
-	print("Starting game with %d rounds and AI difficulty %s" % [rounds, ai_difficulty])
 	Global.game_rounds = rounds
 	Global.ai_difficulty = ai_difficulty
 	var game_instance = main_game.instantiate()
